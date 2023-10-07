@@ -6,7 +6,19 @@
 
 \section{Literature study}
 
-Shannon {\it et al.}\cite{Shannon:A_Mathematical_Theory_of_Communications}
+Malaria is still one of the leading causes of death in low-income countries according to the World Health Organisation \cite{WHO2020}. Mosquitoes that do not carry diseases are also a general nuisance in the everyday life of people living in mosquito-prone areas. Therefore, it is necessary to pursue improvement in our defence against mosquitoes.
+
+To be able to design a laser pointer turret-based mosquito air defence system it is necessary to understand the principles of computer vision object detection and real-time tracking.
+
+One approach towards tracking is to perform pattern matching. In general pattern matching is searching and checking images for the presence of other given images (patterns) to find and mark the patterns' locations (if any) within the given images. However, the study conducted by Hurtik et al. \cite{Hurtik2018} presents results that indicate the best frame rate they achieved was 0.43 frames per second. This is far too slow to be used in a real-time tracking application.
+
+Another approach is to perform particle filter-based tracking. This considers the proximity and behaviour of other targets. In the case of social insect tracking, it is known that two targets cannot occupy the same space, and targets will actively avoid collisions. Unfortunately, the joint particle tracker proposed in \cite{Khan2003} suffers from exponential complexity.
+
+A popular approach is to separate the detection and tracking functions. While numerous deep learning algorithms can detect objects based on appearance, it is worth noting that mosquitoes, particularly when not filmed up close, prove too minute to be reliably detected using appearance-based methods. A viable alternative is to detect objects by isolating the background and foreground of the image \cite{Liang2016}. The foreground of the image contains the objects of interest. In \cite{Bao2018} objects that are too close to one another are split into two and abnormally small objects are merged.
+
+A proposed tracking method is the Simple Online Real-time Tracking (SORT) algorithm \cite{SORT-Bewley2017}. The algorithm is composed of an estimation model which makes use of a Kalman filter and a data association system that is solved optimally using the Hungarian algorithm.
+
+In the proposed mosquito air defence system mosquito detection will be based on background and foreground isolation. This method is suitable because the system will operate in a known test environment where the background will change minimally. The online real-time nature of this system makes the case for pattern matching and particle filtering unfavourable because of the computationally intensive nature of these techniques. The methods in \cite{Liang2016}, \cite{Bao2018}, and \cite{SORT-Bewley2017} will be further investigated for the proposed system.
 
 
 \newpage

@@ -6,13 +6,43 @@
 
 \documentclass{epr400}
 
+%% My packages, was not included in the template
+\usepackage[hidelinks]{hyperref}
+\usepackage{tabularx}
+% This must be after hyperref.
+\usepackage[acronym, nonumberlist, nopostdot]{glossaries} 
+\loadglsentries{abbreviations}
+\makeglossaries
+
+% Define a custom glossary style
+\newglossarystyle{mysuperstyle}{
+  \setglossarystyle{super} % base this style on the 'super' style
+  
+  % Spacing adjustments
+  \renewenvironment{theglossary}
+    {\begin{supertabular}{ @{} l p{\textwidth} }}
+    {\end{supertabular}}
+  \renewcommand{\acronymname}{\vspace{-1.2em}}
+  \renewcommand{\glsgroupskip}{}
+  
+  % Entry format
+  \renewcommand*{\glossentry}[2]{
+    \textbf{\glstarget{##1}{\glossentryname{##1}}} % Make abbreviation bold
+    & \glossentrydesc{##1}\glspostdescription\space ##2\\
+  }
+}
+
+% Use the custom style
+\setglossarystyle{mysuperstyle}
+
+
 %% EDIT: Replace the following with your information.
-\eprtitle{A Smart Green EPR400 Final Report LaTeX digital twin}
+\eprtitle{Laser Pointer Turret Based Mosquito Air Defence System}
 \eprcode{EPR402}
-\eprcandidatename{P. Pompies}
-\eprstudentnumber{12345678}
+\eprcandidatename{A. Hartman}
+\eprstudentnumber{20475323}
 \eprdate{November 2023}
-\eprsupervisor{Mr. X. Why}
+\eprsupervisor{Prof. P. de Villiers}
 \eprcopynum{Electronic copy}
 
 \begin{document}
@@ -41,8 +71,8 @@
 \thispagestyle{empty}
 \newpage
 
-%% Import the required abbreviation pages.
-\input{abbreviations}
+%% Print the list of abbrieviations.
+\printglossary[type=\acronymtype, title={LIST OF ABBREVIATIONS}]
 \newpage
 
 %% --- PART 2 ------------------------------------------------------------
