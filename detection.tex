@@ -1,0 +1,85 @@
+\section{Outline}
+\begin{itemize}
+      \item Might need to do some Gaussian blurring or something to remove noise.
+      \item Perform thresholding on the image to get a binary image
+      \item Perform morphological operations to remove noise. This is done by eroding and dilating the image, combining and separating blobs, and filling holes.
+      \item Detect blobs
+\end{itemize}
+
+\section{Morphological Operations}
+
+Morphological operations are techniques in image processing that process images based on shapes. They apply a structuring element to an input image and produce an output image. These operations are particularly suited to binary images and are very useful for noise reduction, image enhancement, and object segmentation.
+
+
+
+\subsection{Erosion}
+\begin{description}[style=nextline]
+      \item[How it Works:]
+            Erosion erodes away the boundaries of the foreground object (usually white).
+      \item[Structuring Element:]
+            A kernel that specifies the shape.
+      \item[Operation:]
+            The value of the output pixel is the minimum value of all pixels in the neighbourhood. In a binary image, if any of the pixels is set to 0, the output pixel is set to 0.
+      \item[Use:]
+            Erosion is useful for removing small noise, isolating individual elements, and separating objects that are close to each other.
+\end{description}
+
+\subsection{Dilation}
+\begin{description}[style=nextline]
+      \item[How it Works:]
+            Dilation does the opposite of erosion—dilates the boundaries of the foreground object.
+      \item[Operation:]
+            The value of the output pixel is the maximum value of all the pixels in the input pixel's neighbourhood. In a binary image, if any of the pixels is set to 1, the output pixel is set to 1.
+      \item[Use:]
+            Dilation is useful for joining broken parts of an object, filling holes, and connecting objects that are slightly apart.
+\end{description}
+
+\subsection{Opening}
+\begin{description}[style=nextline]
+      \item[How it Works:]
+            Opening is an erosion operation followed by a dilation operation.
+      \item[Use:]
+            Opening is useful for removing noise and separating objects that are close to each other.
+\end{description}
+
+\subsection{Closing}
+\begin{description}[style=nextline]
+      \item[How it Works:]
+            Closing is a dilation operation followed by an erosion operation.
+      \item[Use:]
+            Closing is useful for closing small holes in the foreground and connecting objects that are slightly apart
+\end{description}
+
+\subsection{Morphological Gradient}
+\begin{description}[style=nextline]
+      \item[How it Works:]
+            The morphological gradient is the difference between dilation and erosion of an image.
+      \item[Use:]
+            It is useful for finding the outline of an object.
+\end{description}
+
+\subsection{Recommendations}
+Given that the ideal image contains almost circular blobs and the goal is to remove noise, holes, and separations, the recommended steps are:
+\begin{enumerate}
+      \item \textbf{Opening (Erosion followed by Dilation):} To remove noise and small objects that are not of interest and to separate objects that are close to each other.
+      \item \textbf{Closing (Dilation followed by Erosion):} To fill small holes in the objects of interest and to connect objects that are slightly apart.
+\end{enumerate}
+
+\subsection{Structuring Element}
+For circular shapes, a 3x3 circular structuring element can be used:
+\[
+      \begin{bmatrix}
+            0 & 1 & 0 \\
+            1 & 1 & 1 \\
+            0 & 1 & 0
+      \end{bmatrix}
+\]
+
+\subsection{Note}
+The choice of structuring element and the sequence of operations depend on the specific characteristics of the images, and experimentation with different combinations and sizes of structuring elements may be necessary to achieve the desired results.
+
+
+
+\section{Connect Components Labelling}
+
+Two-pass algorithm running on CPU. Currently, not optimized, taking between 65 and 100 ms to complete.

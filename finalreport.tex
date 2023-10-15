@@ -7,33 +7,37 @@
 \documentclass{epr400}
 
 %% My packages, was not included in the template
-\usepackage[hidelinks]{hyperref}
+\usepackage{units} % For slanted fractions \nicefrac{}{}
+\usepackage{ulem}
 \usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{soul} % For highlighting text with \hl{}
+\usepackage[hidelinks]{hyperref}
+
 % This must be after hyperref.
 \usepackage[acronym, nonumberlist, nopostdot]{glossaries} 
 \loadglsentries{abbreviations}
 \makeglossaries
-
 % Define a custom glossary style
-\newglossarystyle{mysuperstyle}{
+\newglossarystyle{epr_template_style}{
   \setglossarystyle{super} % base this style on the 'super' style
-  
   % Spacing adjustments
   \renewenvironment{theglossary}
     {\begin{supertabular}{ @{} l p{\textwidth} }}
     {\end{supertabular}}
   \renewcommand{\acronymname}{\vspace{-1.2em}}
   \renewcommand{\glsgroupskip}{}
-  
-  % Entry format
   \renewcommand*{\glossentry}[2]{
     \textbf{\glstarget{##1}{\glossentryname{##1}}} % Make abbreviation bold
     & \glossentrydesc{##1}\glspostdescription\space ##2\\
   }
 }
+\setglossarystyle{epr_template_style}
 
-% Use the custom style
-\setglossarystyle{mysuperstyle}
+\setcounter{secnumdepth}{4}
+\renewcommand\theparagraph{\alph{paragraph}}
+\renewcommand\thesubparagraph{\arabic{subparagraph}}
+
 
 
 %% EDIT: Replace the following with your information.
@@ -84,7 +88,8 @@ This section contains the problem identification in the form of the complete app
 \newpage
 
 %% Import the approved project proposal
-\includepdf[pages=-, angle=90]{ApprovedProposal.pdf}
+% \includepdf[pages=-, angle=90]{ApprovedProposal.pdf}
+\includepdf[pages=-, angle=90]{HartmanAM_20475323_R1_FEEDBACK_Comments_Romoved.pdf}
 
 \addtocontents{toc}{\protect\contentsline{subsection}{1. Project description}{}\%}
 \addtocontents{toc}{\protect\contentsline{subsection}{2. Technical challenges in this project}{}\%}

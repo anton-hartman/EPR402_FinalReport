@@ -1,0 +1,81 @@
+\section{Introduction}
+To compute real-world distances using a camera setup, one needs to transition from the image's 2D pixel space to the physical 3D world. This transition involves correcting for distortions and considering the camera's intrinsic and extrinsic parameters.
+
+\section{Camera Calibration}
+
+\subsection{Intrinsic Parameters}
+These parameters are inherent to the camera and remain constant unless the camera's internal settings (like focus) are changed. They are typically found by calibrating the camera using multiple views of a known pattern (like a checkerboard).
+
+\begin{itemize}
+    \item \textbf{Camera Matrix (K)}: Defines the camera's internal characteristics. The principal components are:
+          \[
+              K = \begin{bmatrix}
+                  f_x & 0   & c_x \\
+                  0   & f_y & c_y \\
+                  0   & 0   & 1   \\
+              \end{bmatrix}
+          \]
+          where \(f_x\) and \(f_y\) are the focal lengths in pixels and \(c_x, c_y\) are the coordinates of the principal point. The principal point is the pixel coordinate where the camera's principal axis intersects the image plane.
+
+    \item \textbf{Distortion Coefficients (D)}: Captures lens distortion. This is a vector with up to 5 elements in the common "plumb-bob" model of OpenCV
+          \[
+              D = [k_1, k_2, p_1, p_2, k_3]
+          \]
+          where \(k_1, k_2, k_3\) are radial distortion coefficients and \(p_1, p_2\) are tangential distortion coefficients.
+\end{itemize}
+
+\subsection{Extrinsic Parameters}
+These parameters capture the camera's orientation and position concerning the world or an external reference frame.
+
+\begin{itemize}
+    \item \textbf{Rotation Vector (rvec)}: Represents the orientation of the camera. It's a 3x1 vector used to derive the rotation matrix \( R \).
+
+    \item \textbf{Translation Vector (tvec)}: Represents the position of the camera. It's a 3x1 vector capturing the translation in X, Y, and Z directions.
+\end{itemize}
+
+They represent the position and orientation of the camera relative to the world (or in your case, the turret's frame). Every time you move the camera or change the scene, these parameters would change. These are found using functions like \verb|solvePnP| in OpenCV, which computes the pose of an object given some known 3D points on the object and their corresponding 2D projections in the image.
+
+\section{From Pixels to Real-World Coordinates}
+
+\subsection{Correcting for Distortion}
+First, the pixel points must be undistorted using:
+\begin{equation*}
+    \textbf{P}_{\text{undistorted}} = \text{undistort}(\textbf{P}_{\text{distorted}}, K, D)
+\end{equation*}
+
+
+Both $\textbf{P}_{\text{undistorted}}$ and $\textbf{P}_{\text{distorted}}$ are 2D points in pixel coordinates represented as (u, v).
+
+\subsection{Mapping 2D Pixels to 3D Camera Space}
+Given a known depth \( Z \) (distance from the camera plane), compute the real-world coordinates in the camera's frame:
+\begin{equation*} \label{eq:2d_to_3d}
+    X_{\text{camera}} = Z \times \left( \frac{u - c_x}{f_x} \right)
+\end{equation*}
+\begin{equation*}
+    Y_{\text{camera}} = Z \times \left( \frac{v - c_y}{f_y} \right)
+\end{equation*}
+
+Here, $(u - c_x)$ gives the pixel offset from the principal axis in the horizontal direction, and $(v - c_y)$ gives the pixel offset in the vertical direction. The division by $f$ scales these offsets to the real world, and multiplication by $Z$ places them at the correct depth.
+
+\subsection{Transforming to the Turret's Frame}
+Convert the rotation vector to a rotation matrix using Rodrigues transformation:
+\[
+    R = \text{Rodrigues}(rvec)
+\]
+Here, the Rodrigues function takes the 3x1 rotation vector and converts it into a 3x3 rotation matrix.
+
+The point in the camera frame is then transformed to the turret's frame:
+\[
+    P_{\text{turret}} = R \times P_{\text{camera}} + tvec
+\]
+
+It is assumed that the translation and rotation vectors were determined with the origin of the camera's frame (the checkerboard) at the origin of the turret. If this is not the case then the transformation will not be correct.
+
+\subsubsection*{Alternatively}
+The real-world coordinates of the turret's origin can be computed using \ref{eq:2d_to_3d}. This can then be used as an offset to the turret's frame. This seems to be the more intuitive approach and should be attempted first.
+
+The rotation vector could still be used to make sure the turret's frame is aligned with the camera's frame. The translation would not be used in this case.
+
+
+\section{Conclusion}
+Using the above steps, we can effectively map points from the 2D pixel space of a camera to the 3D real-world coordinates, specifically in the context of a turret system. Proper calibration ensures accurate measurements and transformations.
