@@ -74,8 +74,26 @@ implemented (see \autoref{tab:design_summary}).
 
 \subsection{Theoretical analysis and modelling}
 
-\subsubsection{Mapping camera pixels to real-world co-ordinates}
-To control the laser turret the setpoint and laser position detected with the camera must be converted from the pixels in the camera's co-ordinate frame to the turret's co-ordinate frame. This is done using the camera's intrinsic and extrinsic parameters. The camera's intrinsic parameters are used to convert the pixels to a ray in the camera's co-ordinate frame. The camera's extrinsic parameters are used to convert the ray in the camera's co-ordinate frame to a ray in the turret's co-ordinate frame. The ray in the turret's co-ordinate frame is then converted to the turret's setpoint and laser position. The intrinsic and extrinsic parameters are found using camera calibration.
+\subsubsection{Mapping pixel co-ordinates to metric co-ordinates}
+% \sout{To control the laser turret the setpoint and laser position detected with the camera must be converted from the pixels in the camera's co-ordinate frame to the turret's co-ordinate frame. This is done using the camera's intrinsic and extrinsic parameters. The camera's intrinsic parameters are used to convert the pixels to a ray in the camera's co-ordinate frame. The camera's extrinsic parameters are used to convert the ray in the camera's co-ordinate frame to a ray in the turret's co-ordinate frame. The ray in the turret's co-ordinate frame is then converted to the turret's setpoint and laser position. The intrinsic and extrinsic parameters are found using camera calibration.}
+
+To control the laser, its position must be known in the world co-ordinate frame. The laser position was measured using a camera, thus the camera's pixel co-ordinate frame must be mapped to the world co-ordinate frame. To perform this mapping a camera model is required. The forward imaging model of a camera is shown in \autoref{fig:camera_forward_imaging_model}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/camera/forward_imaging_model.png}
+    \caption{Forward imaging model of a camera. CITE}
+    \label{fig:camera_forward_imaging_model}
+\end{figure}
+
+Using the forward imaging model the pixel distance was mapped to the metric distance for the x-axis with
+\begin{equation}
+    X = Z \times \left( \frac{x - x_{ref}}{f_x} \right)
+    \label{eq:pixel_to_metric}
+\end{equation}
+
+where $Z$ is the depth camera with respect to the world co-ordinate frame, $x$ is the pixel of interest, $x_{ref}$ is the reference pixel, and $f_x$ is the effective focal length of the camera. Similarly, the pixel distance was mapped to the metric distance for the y-axis.
+
+The effective focal length of the camera $f_x$ was determined through camera calibration.
 
 \subsubsection{Camera calibration}
 \paragraph{Intrinsic parameters}\mbox{}\\
@@ -110,6 +128,7 @@ These parameters capture the camera's orientation and position concerning the wo
 
 They represent the position and orientation of the camera relative to the world (or in your case, the turret's frame). Every time you move the camera or change the scene, these parameters would change. These are found using functions like \verb|solvePnP| in OpenCV, which computes the pose of an object given some known 3D points on the object and their corresponding 2D projections in the image.
 
+\subsubsection{SORT tracking}
 
 \subsection{Simulation and Prototyping}
 Detection and tracking done in python with videos.
@@ -123,25 +142,25 @@ Detection and tracking done in python with videos.
 \newcommand{\enclosureHeightCM}{38} % cm
 \newcommand{\enclosureDepthCM}{32} % cm
 
-The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. The laser turret and the camera were placed outside the enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, was designed to hold the laser turret and the camera in place relative to the mosquito enclosure.
+The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. Internal lighting was added to the enclosure to ensure contrast between the background and the mosquitoes and to minimise the camera noise. The laser turret and the camera were placed outside the enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, was designed to hold the laser turret and the camera in place relative to the mosquito enclosure.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/rectangular_prism.png}
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/rectangular_prism.png}
     \caption{Mosquito enclosure dimensions.}
     \label{fig:mosquito_enclosure_dimensions}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/positioning_bracket.png}
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/positioning_bracket.png}
     \caption{System positioning bracket.}
     \label{fig:system_positioning_bracket}
 \end{figure}
 
 \subsubsection{Laser turret design}
 
-The laser turret design was inspired by commercial two-axis laser scanners. A schematic for a typical two-axis laser scanner can be seen in \autoref{fig:2-axis-laser-scanner-schematic}. The mirrors \hl{are} connected directly to the output shaft of the motor. The origin of the laser turret \hl{is} where the laser beam shines orthogonal to the mosquito plane, which occurs when the two mirrors \hl{are} at 45$\degree$ relative to the angle of the laser beam when the origin of the laser beam is parallel to the mosquito plane. When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the mosquito plane as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $\pm x$ from the origin of the laser turret can be calculated using
+The laser turret design was inspired by commercial two-axis laser scanners. A schematic for a typical two-axis laser scanner can be seen in \autoref{fig:two-axis-scanner-schematic}. The mirrors \hl{are} connected directly to the output shaft of the motor. The origin of the laser turret \hl{is} where the laser beam shines orthogonal to the mosquito plane, which occurs when the two mirrors \hl{are} at 45$\degree$ relative to the angle of the laser beam when the origin of the laser beam is parallel to the mosquito plane. When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the mosquito plane as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $\pm x$ from the origin of the laser turret can be calculated using
 \begin{equation}
     \theta = \arctan{\left(\frac{\pm x}{z}\right)}
     \label{eq:mirror_angle}
@@ -150,14 +169,14 @@ where $z$ is the distance between the turret and the mosquito plane.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/2_axis_laser_scanner.png}
-    \caption{Two-axis laser scanner schematic. This figure was modified from \cite{2-axis-scanner-schematic}.}
-    \label{fig:2-axis-laser-scanner-schematic}
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/two_axis_scanner.png}
+    \caption{Two-axis laser scanner schematic. This figure was modified from \cite{two-axis-scanner-schematic}.}
+    \label{fig:two-axis-scanner-schematic}
 \end{figure}
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/mirror_angle.png}
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/mirror_angle.png}
     \caption{Mirror angle calculation.}
     \label{fig:mirror_angle}
 \end{figure}
@@ -199,7 +218,7 @@ The required motor step resolution was calculated by substituting $x_{min}$ and 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\textwidth]{figures/rotation_range_of_first_axis.pdf}
+    \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
     \caption{Rotation range of first axis with chosen mirror dimensions.}
     \label{fig:turret_motion_range}
 \end{figure}
@@ -237,7 +256,7 @@ The need for precise position control of the laser meant that only stepper and s
 
 \begin{figure}
     \centering
-    \includegraphics[scale=1]{figures/cylinder_central_axis.png}
+    \includegraphics[scale=1]{figures/hardware_design/cylinder_central_axis.png}
     \caption{Central axis of a cylinder.}
     \label{fig:cylinder_central_axis}
 \end{figure}
@@ -301,8 +320,66 @@ and thus the required torque $\tau$ is given by
 
 
 \subsection{Software design}
-Mapping between pixels and real distance. Mosquito detection and tracking. Laser detection and tracking. \gls{pid} controller. Feedback for turret. Distinguishing between laser reflections.
+\textit{Mapping between pixels and real distance. Mosquito detection and tracking. Laser detection and tracking. \gls{pid} controller. Feedback for turret. Distinguishing between laser reflections.}
 
+\subsubsection{Mosquito and laser detection}
+It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame would be cropped such that only the back wall of the enclosure is visible.
+
+The detection system was designed to work with a red laser because the computational complexity could then be decreased by only considering the red channel of the \gls{rgb} frame.
+
+The mosquito detection was designed to detect dark blobs in the enclosure and would not be able to distinguish between mosquitoes and other dark blobs. The laser detection was designed to detect bright blobs in the enclosure and would not be able to distinguish between the laser and its reflections. The mosquito and laser detection processes are similar in nature. The basic detection process flow is shown in \autoref{fig:detection_process_flow}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/detection/detection_process_flow.pdf}
+    \caption{Detection process flow.}
+    \label{fig:detection_process_flow}
+\end{figure}
+
+The only difference between the mosquito and laser detection is the binarisation step.
+
+\paragraph{Binarisation}\mbox{}\\
+Thresholding or bg sub.
+
+\paragraph{Morphological operations}\mbox{}\\
+The respective binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations. Morphological operations work by passing a structuring element over the pixels in a image and performing a logical operation on the pixels in the image that are covered by the structuring element.
+
+The noise and erroneously joint sections are removed using the morphological opening operation. The opening of A by B is the union of all translations of B that are completely contained in A. This can be intuitively understood as illuminated in \autoref{fig:opening}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/detection/opening.png}
+    \caption{The opening of A by B.}
+    \label{fig:opening}
+\end{figure}
+
+The holes and erroneously disjointed sections are removed using the morphological closing operation. The closing of A by B is the complement of the union of all translations of B that do not overlap A. This can be intuitively understood as illuminated in \autoref{fig:closing}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/detection/closing.png}
+    \caption{The closing of A by B.}
+    \label{fig:closing}
+\end{figure}
+
+The structuring element B will be tuned to obtain the best results.
+
+\paragraph{Connected components labelling}\mbox{}\\
+The connected components labelling algorithm labels the connected components in a binary image. The algorithm works by iterating over the pixels in the image and assigning a label to each pixel. The label of a pixel is determined by the labels of the pixels in its neighbourhood. The neighbourhood of a pixel can be defined using either four or eight connectivity. 4 connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. 8 connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
+% The algorithm is illustrated in \autoref{fig:connected_components_labelling}.
+
+\begin{figure}[h]
+    \centering
+    \subfigure[Four connectivity.
+        \label{fig:four_connectivity}]
+    {\includegraphics[width=0.2\textwidth]{figures/detection/square_4_connectivity.png}}
+    \mbox{\hspace{1cm}}
+    \subfigure[Eight connectivity.
+        \label{fig:eight_connectivity}]
+    {\includegraphics[width=0.2\textwidth]{figures/detection/square_8_connectivity.png}}
+    \caption{Connected components labelling connectivity.}
+    \label{fig:ccl_connectivity}
+\end{figure}
 
 \subsection{Software implementation and optimisation}
 Only using red channel, \gls{gpu}, low resolution, etc.
