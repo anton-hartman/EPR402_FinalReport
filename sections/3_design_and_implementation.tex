@@ -119,8 +119,18 @@ Detection and tracking done in python with videos.
 \textit{Turret inspired by 2d laser scanners. Motor step resolution, speed, and torque calculations. Motor driver selection based on microstepping capabilities. Turret CAD design. Math translation between angle and distance of laser.}
 
 \subsubsection{Mosquito enclosure and system positioning}
+\newcommand{\enclosureWidthCM}{90} % cm
+\newcommand{\enclosureHeightCM}{38} % cm
+\newcommand{\enclosureDepthCM}{32} % cm
 
-The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The laser turret and the camera were placed in known positions relative to the enclosure. A bracket, shown in \autoref{fig:system_positioning_bracket}, was built to hold the laser turret and the camera in place relative to the mosquito enclosure.
+The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. The laser turret and the camera were placed outside the enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, was designed to hold the laser turret and the camera in place relative to the mosquito enclosure.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/rectangular_prism.png}
+    \caption{Mosquito enclosure dimensions.}
+    \label{fig:mosquito_enclosure_dimensions}
+\end{figure}
 
 \begin{figure}[h]
     \centering
@@ -131,9 +141,9 @@ The mosquitoes were placed inside an enclosure with a white lining and a glass f
 
 \subsubsection{Laser turret design}
 
-The laser turret design was inspired by commercial two-axis laser scanners. A schematic for a typical two-axis laser scanner can be seen in \autoref{fig:2-axis-laser-scanner-schematic}. The mirrors \hl{are} connected directly to the output shaft of the motor. The origin of the laser turret \hl{is} where the laser beam shines orthogonal to the mosquito plane, which occurs when the two mirrors \hl{are} at 45$\degree$ relative to the angle of the laser beam when the origin of the laser beam is parallel to the mosquito plane. When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the mosquito plane as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle \hl{$\theta$} required to shine the laser a distance $x$ from the origin of the laser turret can be calculated using
+The laser turret design was inspired by commercial two-axis laser scanners. A schematic for a typical two-axis laser scanner can be seen in \autoref{fig:2-axis-laser-scanner-schematic}. The mirrors \hl{are} connected directly to the output shaft of the motor. The origin of the laser turret \hl{is} where the laser beam shines orthogonal to the mosquito plane, which occurs when the two mirrors \hl{are} at 45$\degree$ relative to the angle of the laser beam when the origin of the laser beam is parallel to the mosquito plane. When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the mosquito plane as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $\pm x$ from the origin of the laser turret can be calculated using
 \begin{equation}
-    \theta = \arctan{\frac{x}{z}}
+    \theta = \arctan{\left(\frac{\pm x}{z}\right)}
     \label{eq:mirror_angle}
 \end{equation}
 where $z$ is the distance between the turret and the mosquito plane.
@@ -152,11 +162,76 @@ where $z$ is the distance between the turret and the mosquito plane.
     \label{fig:mirror_angle}
 \end{figure}
 
-\paragraph{Precise geometry of the laser turret}\mbox{}\\
-In the design of the laser turret there are multiple dimensions that are dependent on each other, and it is up to the designer to choose certain practical dimensions from which the rest of the dimensions can be calculated. In this design the dimensions of the mirrors were chosen for practicality as 30~mm by 15~mm. These dimensions will be used throughout the rest of the design.
+The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the mosquito plane, while maintaining sufficient speed.
+
+\paragraph{Lateral step size and speed}\mbox{}\\
+\newcommand{\requiredLatStepSizeMM}{2} % mm
+The lateral step size of the laser must be on the order of $\requiredLatStepSizeMM$ mm (size of mosquito plus size of laser).
+
+\newcommand{\requiredLatSpeedMPS}{1} % m/s
+The required lateral speed is determined in accordance with the field specifications the longest length of the mosquito enclosure \hl{is} \hl{1~m}. To ensure that the laser could illuminate the set point within \hl{2} seconds of receiving a step input it was assumed that the laser must be able to move with a velocity $v$ of least \requiredLatSpeedMPS~m/s opposed to 0.5~m/s required to move the 1~m length of the mosquito enclosure within 2 seconds. This was done to accommodate for the settling time of the control system. This is also faster than the top speed of a mosquito which is 0.67~m/s according to SOURCE.
+
+\paragraph{Lateral to angular step size}\mbox{}\\
+\label{par:lateral_to_angular_step_size}
+In the design of the laser turret there were multiple dimensions that were dependent on each other, it is up to the designer to choose certain practical dimensions from which the rest of the dimensions can be calculated. In this design the dimensions of the mirrors were chosen for practicality as $30 \times 15$ mm. These dimensions will be used throughout the rest of the design.
+
+The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate from the origin (45$\degree$ point) is $\theta_{max} =\pm 20\degree$ (add conservatively estimated) resulting in a $40\degree$ range of motion. This was determined geometrically in \autoref{fig:turret_motion_range}. The lines representing the mirrors in \autoref{fig:turret_motion_range} are 30~mm long and the whole figure is drawn to scale. The rotation range of the second axis is not bounded by the geometry of the turret since the laser beam reflected from the second axis is incident on the mosquito plane. Therefore, the turret was oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
+
+To maximise the angle through which the turret must rotate to move the laser beam across the height of the mosquito enclosure the minimum distance $z_{min}$ between the turret and the mosquito plane was determined by rearranging \autoref{eq:mirror_angle} to give
+\begin{equation}
+    z = \frac{\pm x}{\tan{\theta}}.
+    \label{eq:distance_calculation}
+\end{equation}
+where $x = \enclosureHeightCM$~cm is the height of the mosquito enclosure. The minimum distance $z_{min}$ was calculated by substituting $\theta_max = 20\degree$ into \autoref{eq:distance_calculation} to give
+
+\FPeval{\zMinCM}{round(\enclosureHeightCM/tan(20*pi/180), 1)}
+\begin{equation}
+    z_{min} = \frac{\enclosureHeightCM \text{cm}}{\tan{20\degree}} = \zMinCM. \text{cm}.
+    \label{eq:z_min_calculation}
+\end{equation}
+
+The required motor step resolution was calculated by substituting $x_{min}$ and $z_{min}$ into \autoref{eq:mirror_angle} to give
+\pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
+\begin{equation}
+    \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \stepRes\degree
+    \label{eq:step_resolution_calculation}
+\end{equation}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/rotation_range_of_first_axis.pdf}
+    \caption{Rotation range of first axis with chosen mirror dimensions.}
+    \label{fig:turret_motion_range}
+\end{figure}
+
+\paragraph{Lateral speed to angular speed}\mbox{}\\
+From \autoref{par:lateral_to_angular_step_size} it is known that
+\pgfmathsetmacro{\enclosureHeightM}{\enclosureHeightCM/100}\enclosureHeightM
+\begin{equation}
+    \begin{aligned}
+                 & \SI{\enclosureHeightM}{\meter\per\second} = \SI{40}{\degree\per\second}                                                            \\
+        \implies & \enclosureHeightM \times \frac{\requiredLatSpeedMPS}{\enclosureHeightM} = 40 \times \frac{\requiredLatSpeedMPS}{\enclosureHeightM} \\
+        \implies & \SI{\requiredLatSpeedMPS}{\meter\per\second} = \pgfmathsetmacro{\result}{40/\enclosureHeightM} \SI{\result}{\per\second}
+    \end{aligned}
+\end{equation}
+The angular speed required to move the laser beam at a lateral speed $v = \SI{\requiredLatSpeedMPS}{\meter\per\second}$ was calculated with $\theta_{max}$ determined in \autoref{par:lateral_to_angular_step_size} using
+\begin{equation}
+    \omega = v \times \theta_{max}.
+    \label{eq:angular_velocity_calculation}
+\end{equation}
+
+% Thus, the required angular velocity $\omega_f$ is given by (if assumed that the first axis will cover the width, thus it must actually be faster)
+% \begin{equation}
+%   \omega_f = v \times \theta = 1 \text{m/s} \times 40\degree \times \frac{\pi}{180} = 0.698 \text{rad/s}.
+%   \label{eq:angular_velocity_calculation}
+% \end{equation}
+
+
+
+
 
 \subsubsection{Motor requirements}
-\hl{The motor requirements were determined based on system requirement 4 (The laser must be able to illuminate the set point within 2 seconds accurate to within 1~mm.).}
+\sout{The motor requirements were determined based on system requirement 4 (The laser must be able to illuminate the set point within 2 seconds accurate to within 1~mm.).}
 
 The need for precise position control of the laser meant that only stepper and servo motors were considered. The required torque and required \gls{rpm} was calculated to enable appropriate motor selection. \sout{and the resulting laser step size on the mosquito plane were calculated.} In the calculations only a single axis of the turret was considered since the motors and mirrors for both axes \hl{will be} identical and operate independently.
 
@@ -179,7 +254,7 @@ The moment of inertia for the mirror was calculated by \hl{assuming} the mirror 
     I = \frac{1}{2}Mr^2
     \label{eq:moment_of_inertia}
 \end{equation}
-where $M$ is the mass of the cylinder and $r = \nicefrac{d}{2}$ is the radius of the cylinder. The mass of the cylinder $M$ was calculated using the density of glass $\rho = 2500 \text{kg/m}^3$ and the volume of the cylinder $V$ given by
+where $M$ is the mass of the cylinder and $r = \sfrac{d}{2}$ is the radius of the cylinder. The mass of the cylinder $M$ was calculated using the density of glass $\rho = 2500 \text{kg/m}^3$ and the volume of the cylinder $V$ given by
 \begin{equation}
     V = \pi r^2 h.
     \label{eq:cylinder_volume}
@@ -200,23 +275,12 @@ The angular acceleration of the motor $\alpha$ is calculated by
     \alpha = \frac{\Delta\omega}{\Delta t}
     \label{eq:angular_acceleration}
 \end{equation}
-where $\Delta\omega = \omega_f - \omega_i$ is the change in angular velocity and $\Delta t$ is the change in time. In accordance with the field specifications the longest length of the mosquito enclosure \hl{is} \hl{1~m}. To ensure that the laser could illuminate the set point within \hl{2} seconds of receiving a step input it was assumed that the laser must be able to move with a velocity $v$ of least 1~m/s opposed to 0.5~m/s required to move the 1~m length of the mosquito enclosure within 2 seconds. This was done to accommodate for the settling time of the control system. This is also faster than the top speed of a mosquito which is 0.67~m/s according to SOURCE. This velocity was translated into the angular velocity $\omega_f$ using
+where $\Delta\omega = \omega_f - \omega_i$ is the change in angular velocity and $\Delta t$ is the change in time.  This velocity was translated into the angular velocity $\omega_f$ using
 \begin{equation}
-    \omega = v \times \theta
+    \omega = v \times \theta_{max}
     \label{eq:angular_velocity}
 \end{equation}
-where $\theta$ is the angle through which the mirror must rotate to produce a 1~m lateral displacement of the laser on the mosquito plane. The angle $\theta$ was determined geometrically using the dimensions of the mirrors as shown in \autoref{fig:turret_motion_range}.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{figures/turret_motion_range.png}
-    \caption{Geometric calculation of the range of motion $\theta$ enabled by the mirror dimensions.}
-    \label{fig:turret_motion_range}
-\end{figure}
-From the geometry of turret seen in \autoref{fig:turret_motion_range} it can be seen that the maximum range through which the first axis of the turret can rotate is 40$\degree$. Thus, the required angular velocity $\omega_f$ is given by
-\begin{equation}
-    \omega_f = v \times \theta = 1 \text{m/s} \times 40\degree \times \frac{\pi}{180} = 0.698 \text{rad/s}.
-    \label{eq:angular_velocity_calculation}
-\end{equation}
+where $\theta_{max}$ is the angle through which the mirror must rotate to produce a 1~m lateral displacement of the laser on the mosquito plane.
 
 The change in time $\Delta t$ was determined by assuming the laser must be able to accelerate from a stand still to 1~m/s extremely rapidly to ensure that the motors could respond to the irregular flight pattern associated with a mosquito. It was assumed that this acceleration must occur within 10~ms.
 

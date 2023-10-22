@@ -7,7 +7,11 @@
 \documentclass{epr400}
 
 %% My packages, was not included in the template
-\usepackage{units} % For slanted fractions \nicefrac{}{}
+\usepackage{siunitx} % For SI units
+% \usepackage{units} % For slanted fractions \nicefrac{}{}
+\usepackage{xfrac} % For slanted fractions \sfrac{}{}
+\usepackage{fp} % For floating point calculations
+\usepackage{pgfmath} % Include the pgfmath package
 \usepackage{ulem}
 \usepackage{tabularx}
 \usepackage{enumitem}
@@ -34,10 +38,11 @@
 }
 \setglossarystyle{epr_template_style}
 
+
+% Level 4 headings with \paragraph{
 \setcounter{secnumdepth}{4}
 \renewcommand\theparagraph{\alph{paragraph}}
 \renewcommand\thesubparagraph{\arabic{subparagraph}}
-
 
 
 %% EDIT: Replace the following with your information.
@@ -89,7 +94,7 @@ This section contains the problem identification in the form of the complete app
 
 %% Import the approved project proposal
 % \includepdf[pages=-, angle=90]{ApprovedProposal.pdf}
-\includepdf[pages=-, angle=90]{HartmanAM_20475323_R1_FEEDBACK_Comments_Romoved.pdf}
+% \includepdf[pages=-, angle=90]{HartmanAM_20475323_R1_FEEDBACK_Comments_Romoved.pdf}
 
 \addtocontents{toc}{\protect\contentsline{subsection}{1. Project description}{}\%}
 \addtocontents{toc}{\protect\contentsline{subsection}{2. Technical challenges in this project}{}\%}
