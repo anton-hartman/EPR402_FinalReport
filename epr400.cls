@@ -21,8 +21,8 @@
 %% Use the "geometry" package to maximize page usage whilst retaining enough
 %%   margin space for staples and editorial notes.
 \RequirePackage[a4paper,includefoot,nohead,
-                top=25mm,left=30mm,right=25mm,bottom=25mm
-               ]{geometry}
+  top=25mm,left=30mm,right=25mm,bottom=25mm
+]{geometry}
 
 %% Load support for colour.
 \RequirePackage[table]{xcolor}
@@ -63,7 +63,7 @@
 %% Enable more advanced character protrusion and font expansion, adjustment
 %%   of inter-word spacing and additional kerning, etc.
 \RequirePackage[activate={true,nocompatibility},tracking=true,
-    kerning=true,spacing=true]{microtype}
+  kerning=true,spacing=true]{microtype}
 \microtypecontext{spacing=nonfrench}
 
 %% Load modern Latin font encoding template T1, as well as additional
@@ -126,41 +126,41 @@
 \addto\captionsbritish{%
   \renewcommand{\contentsname}%
   {TABLE OF CONTENTS}%
-  }
+}
 
 %% Remove the "Bibliography" so that the section header can be used.
 \addto\captionsbritish{%
   \renewcommand{\bibname}%
-    {References}%
+  {References}%
 }
 
 %% Remove the "Bibliography" so that the section header can be used.
 \addto\captionsbritish{%
   \renewcommand{\refname}%
-    {References}%
+  {References}%
 }
 
 %% Redefine the bibliography environment so that the title is displayed
 %%   using the standard section command, but made uppercase as is required.
 \renewenvironment{thebibliography}[1]
-     {\section{\refname}%
-      \@mkboth{\refname}{\refname}%
-      \list{\@biblabel{\@arabic\c@enumiv}}%
-           {\settowidth\labelwidth{\@biblabel{#1}}%
-            \leftmargin\labelwidth
-            \advance\leftmargin\labelsep
-            \@openbib@code
-            \usecounter{enumiv}%
-            \let\p@enumiv\@empty
-            \renewcommand\theenumiv{\@arabic\c@enumiv}}%
-      \sloppy
-      \clubpenalty4000
-      \@clubpenalty \clubpenalty
-      \widowpenalty4000%
-      \sfcode`\.\@m}
-     {\def\@noitemerr
-       {\@latex@warning{Empty `thebibliography' environment}}%
-      \endlist}
+{\section{\refname}%
+  \@mkboth{\refname}{\refname}%
+  \list{\@biblabel{\@arabic\c@enumiv}}%
+  {\settowidth\labelwidth{\@biblabel{#1}}%
+    \leftmargin\labelwidth
+    \advance\leftmargin\labelsep
+    \@openbib@code
+    \usecounter{enumiv}%
+    \let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}}%
+  \sloppy
+  \clubpenalty4000
+  \@clubpenalty \clubpenalty
+  \widowpenalty4000%
+  \sfcode`\.\@m}
+{\def\@noitemerr
+  {\@latex@warning{Empty `thebibliography' environment}}%
+  \endlist}
 
 %% Enable fancy headers and set to required format.
 \RequirePackage{fancyhdr}
@@ -191,7 +191,7 @@
 
 %% Add support for pseudo code for algorithms
 \RequirePackage{algorithm}
-\RequirePackage{algorithmic}
+% \RequirePackage{algorithmic}
 
 %% Enable fancy long tables.
 \RequirePackage{longtable}
@@ -223,7 +223,7 @@
 %% Load package to support advanced vector graphics.
 \RequirePackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning,matrix,mindmap,
-                shadows,fit,calc,intersections}
+  shadows,fit,calc,intersections}
 \pgfdeclarelayer{background}
 \pgfdeclarelayer{foreground}
 \pgfsetlayers{background,main,foreground}
@@ -374,7 +374,7 @@
 
 %% For the included proposal section the margin lines must be adapted.
 \RequirePackage[topline=false, bottomline=false, leftmargin=-5mm,
-    rightmargin=-5mm]{mdframed}
+  rightmargin=-5mm]{mdframed}
 
 % Disable paragraph indent and set default paragraph skip.
 \setlength{\parindent}{0 pt}
@@ -436,8 +436,8 @@
 
 % Pull in support for EPS -> PDF conversion for the UP logo.
 \ifpdf{}
-  \usepackage{epstopdf}
-  \pdfadjustspacing=1
+\usepackage{epstopdf}
+\pdfadjustspacing=1
 \else
 \fi
 
@@ -448,8 +448,8 @@
   \setlength{\fboxsep}{10pt}%
   \framebox[\textwidth]{\fontsize{16pt}{18.6pt}\selectfont\bfseries\Large #1\hfill}
   \addcontentsline{toc}{part}{#1}
-% {\bfseries\Large #1}\\[-0.75ex]
-% \rule{\textwidth}{0.4pt}
+  % {\bfseries\Large #1}\\[-0.75ex]
+  % \rule{\textwidth}{0.4pt}
 }
 
 \newcommand{\eprtitle}[1]{\newcommand{\eprthetitle}{#1}}
@@ -464,45 +464,45 @@
 \newcommand{\maketitlepage}{
 \thispagestyle{empty}
 {
-  \renewcommand{\baselinestretch}{1.5}
-  \setlength{\parindent}{0mm}
-  \setlength{\parskip}{0mm}
-  \centering
+\renewcommand{\baselinestretch}{1.5}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{0mm}
+\centering
 
-  \vspace*{\stretch{1}}
+\vspace*{\stretch{1}}
 
-  {\bfseries\LARGE\eprthetitle}
+{\bfseries\LARGE\eprthetitle}
 
-  \vspace*{\stretch{1}}
+\vspace*{\stretch{1}}
 
-  {\Large Final Report}
+{\Large Final Report}
 
-  \vspace*{\stretch{1}}
+\vspace*{\stretch{1}}
 
-  {\bfseries\Large\eprthecandidatename} \\[1ex]
-  {\Large\eprthestudentnumber}
+{\bfseries\Large\eprthecandidatename} \\[1ex]
+{\Large\eprthestudentnumber}
 
-  \vspace*{\stretch{2}}
+\vspace*{\stretch{2}}
 
-  {\large
+{\large
   Submitted as partial fulfilment of the requirements of Project \eprthemodulecode \\
   in the Department of Electrical, Electronic and Computer Engineering \\
   University of Pretoria \\
-  }
+}
 
-  \vspace*{\stretch{1}}
+\vspace*{\stretch{1}}
 
-  {\large\eprthedate}
+{\large\eprthedate}
 
-  \vspace*{\stretch{1}}
+\vspace*{\stretch{1}}
 
-  {\Large Study leader: \eprthesupervisor}
+{\Large Study leader: \eprthesupervisor}
 
-  \vspace*{\stretch{4}}
+\vspace*{\stretch{4}}
 
-  % \begin{flushright}
-  % {\normalsize \eprthecopynum}
-  % \end{flushright}
+% \begin{flushright}
+% {\normalsize \eprthecopynum}
+% \end{flushright}
 }
 \newpage
 }

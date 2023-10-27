@@ -108,27 +108,177 @@ These parameters are inherent to the camera and remain constant unless the camer
                   0   & 0   & 1   \\
               \end{bmatrix}
           \end{equation}\\
-          where \(f_x\) and \(f_y\) are the focal lengths in pixels and \(c_x, c_y\) are the co-ordinates of the principal point. The principal point is the pixel co-ordinate where the camera's principal axis intersects the image plane.
+          where $f_x$ and $f_y$ are the focal lengths in pixels and $c_x, c_y$ are the co-ordinates of the principal point. The principal point is the pixel co-ordinate where the camera's principal axis intersects the image plane.
 
     \item \textbf{Distortion Coefficients (D)}: Captures lens distortion. This is a vector with up to 5 elements in the common "plumb-bob" model of OpenCV
           \[
               D = [k_1, k_2, p_1, p_2, k_3]
           \]
-          where \(k_1, k_2, k_3\) are radial distortion coefficients and \(p_1, p_2\) are tangential distortion coefficients.
+          where $k_1, k_2, k_3$ are radial distortion coefficients and $p_1, p_2$ are tangential distortion coefficients.
 \end{itemize}
 
 \paragraph{Extrinsic Parameters}\mbox{}\\
 These parameters capture the camera's orientation and position concerning the world or an external reference frame.
 
 \begin{itemize}
-    \item \textbf{Rotation Vector (rvec)}: Represents the orientation of the camera. It's a 3x1 vector used to derive the rotation matrix \( R \).
+    \item \textbf{Rotation Vector (rvec)}: Represents the orientation of the camera. It's a 3x1 vector used to derive the rotation matrix $ R $.
 
     \item \textbf{Translation Vector (tvec)}: Represents the position of the camera. It's a 3x1 vector capturing the translation in X, Y, and Z directions.
 \end{itemize}
 
 They represent the position and orientation of the camera relative to the world (or in your case, the turret's frame). Every time you move the camera or change the scene, these parameters would change. These are found using functions like \verb|solvePnP| in OpenCV, which computes the pose of an object given some known 3D points on the object and their corresponding 2D projections in the image.
 
-\subsubsection{SORT tracking}
+\subsubsection{Morphological operations}
+\label{subsubsec:morphological_operations}
+
+Erosion is a fundamental morphological operation used to remove small structures or details from a binary image. It is defined as the basic set operation of moving a structuring element (usually a smaller binary matrix) over the input binary image and finding the intersection of the structuring element with the image. This operation can be mathematically expressed as
+
+\begin{equation}
+    (A \ominus B)(x, y) = \bigcap \{A(x + i, y + j) | (i, j) \in B\}
+    \label{eq:erosion}
+\end{equation}
+
+where
+\begin{itemize}
+    \item $A$ is the input binary image.
+    \item $B$ is the structuring element.
+    \item $\ominus$ represents the erosion operation.
+    \item $(x, y)$ are the pixel co-ordinates in the resulting image.
+\end{itemize}
+
+Dilation is another fundamental morphological operation, but it is used to enhance or grow the features in a binary image. Dilation can be defined as the set operation that moves the structuring element over the input image and computes the union of the element with the parts of the image where the structuring element "hits". The mathematical expression for dilation is as follows:
+
+\begin{equation}
+    (A \oplus B)(x, y) = \bigcup \{A(x + i, y + j) | (i, j) \in B\}
+    \label{eq:dilation}
+\end{equation}
+
+where
+\begin{itemize}
+    \item $A$ is the input binary image.
+    \item $B$ is the structuring element.
+    \item $\oplus$ represents the dilation operation.
+    \item $(x, y)$ are the pixel co-ordinates in the resulting image.
+\end{itemize}
+
+The erosion and dilation operations are illustrated in \autoref{fig:erosion_and_dilation}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{figures/detection/erosion.png}
+        \caption{The erosion of the dark-blue square by a disk, resulting in the light-blue square.}
+        \label{fig:erosion}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{figures/detection/dilation.png}
+        \caption{The dilation of a dark-blue square by a disk, resulting in the light-blue square with rounded corners.}
+        \label{fig:dilation}
+    \end{subfigure}
+    \caption{The figure shows an example of erosion and dilation. This figure was modified from Renatokeshet at the English Wikipedia (2008).}
+    \label{fig:erosion_and_dilation}
+\end{figure}
+
+Opening is a compound morphological operation that consists of an erosion followed by a dilation using the same structuring element. It is primarily used to remove noise and small objects from a binary image. The opening of an image $A$ by a structuring element $B$ is defined as
+
+\begin{equation}
+    A \circ B = (A \ominus B) \oplus B
+    \label{eq:opening}
+\end{equation}
+
+where
+\begin{itemize}
+    \item $A$ is the input binary image.
+    \item $B$ is the structuring element.
+    \item $\circ$ represents the opening operation.
+\end{itemize}
+
+Closing is another compound morphological operation that consists of dilation followed by an erosion using the same structuring element. It is used to close small holes and gaps in objects and to connect nearby objects. The closing of an image $A$ by a structuring element $B$ is defined as
+
+\begin{equation}
+    A \bullet B = (A \oplus B) \ominus B
+    \label{eq:closing}
+\end{equation}
+
+where
+\begin{itemize}
+    \item $A$ is the input binary image.
+    \item $B$ is the structuring element.
+    \item $\bullet$ represents the closing operation.
+\end{itemize}
+
+Opening and closing are both idempotent operations, meaning that repeated openings or closing have no effect on the image. Opening and closing is illustrated in \autoref{fig:opening_and_closing}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{figures/detection/opening.png}
+        \caption{The opening of the dark-blue square by a disk, resulting in the light-blue square with round corners.}
+        \label{fig:opening}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.5\linewidth]{figures/detection/closing.png}
+        \caption{The closing of the dark-blue shape (union of two squares) by a disk, resulting in the union of the dark-blue shape and the light-blue areas.}
+        \label{fig:closing}
+    \end{subfigure}
+    \caption{The figure shows and example of opening and closing. This figure was modified from Renatokeshet at the English Wikipedia (2008).}
+    \label{fig:opening_and_closing}
+\end{figure}
+
+\subsubsection{Kalman filter} \label{subsubsec:kalman_filter}
+The Kalman filter is a recursive algorithm that estimates the state of a system from a series of noisy measurements. It is a powerful tool for tracking the state of a system over time and is widely used in control systems and robotics. The Kalman filter is based on a linear dynamical system model, which is defined by the following equations:
+
+\begin{equation}
+    \begin{aligned}
+        x_k & = Ax_{k - 1} + Bu_{k - 1} + w_{k - 1} \\
+        z_k & = Hx_k + v_k
+    \end{aligned}
+    \label{eq:kalman_filter}
+\end{equation}
+
+where
+
+\begin{itemize}
+    \item $x_k$ is the state vector at time $k$.
+    \item $z_k$ is the measurement vector at time $k$.
+    \item $A$ is the state transition matrix.
+    \item $B$ is the control matrix.
+    \item $u_k$ is the control vector at time $k$.
+    \item $w_k$ is the process noise vector at time $k$.
+    \item $H$ is the observation matrix.
+    \item $v_k$ is the measurement noise vector at time $k$.
+\end{itemize}
+
+
+\subsubsection{SORT tracking} \label{subsubsec:sort_tracking}
+SORT (Simple Online and Realtime Tracking) is a popular algorithm for multi-object tracking in video sequences. The main goal of the SORT algorithm is to associate detection boxes across frames in a video sequence to form trajectories for each individual object. Here is a theoretical background on the SORT tracking algorithm:
+1. Overview
+
+SORT is designed to be both simple and efficient, achieving real-time performance. It is based on the tracking-by-detection paradigm, which means it relies on an external object detector to provide bounding boxes around objects of interest in each frame. The algorithm then associates these detections across frames to create tracks.
+2. Detection
+
+Before tracking, an object detection algorithm (such as Faster R-CNN, YOLO, or SSD) is applied to each frame to detect objects of interest. The output is a set of bounding boxes along with their associated confidence scores.
+3. Association
+
+The core of the SORT algorithm is the association step, where detections are linked across frames to form tracks. This is done based on the intersection over union (IoU) metric, which measures the overlap between two bounding boxes. The steps involved are:
+
+Prediction: For each existing track, the Kalman filter is used to predict the new position of the object in the current frame.
+Matching: The predicted positions of existing tracks are matched with the current frame's detections based on the IoU metric. A bipartite graph matching algorithm (such as the Hungarian algorithm) is used to find the optimal assignment.
+Update: The Kalman filter for each matched track is updated with the current detection.
+Creation and Deletion: New tracks are created for detections that could not be matched to existing tracks. Tracks that have not been matched for a certain number of frames are deleted.
+
+4. Kalman Filter
+
+The Kalman filter is a critical component of the SORT algorithm, providing a way to predict and update the state of the tracks based on the detections. The state of a track is represented as $[x,y,\dot{x},\dot{y}]$, where x,yx,y are the coordinates of the center of the bounding box, ss is the scale/area of the bounding box, rr is the aspect ratio, and $\dot{x},\dot{y}$ are the respective velocities.
+5. Challenges and Limitations
+
+Occlusions: SORT can struggle with objects that are occluded or interact closely with each other, as the IoU metric may not be sufficient for correct association.
+Identity Switches: In cases where objects cross paths or are close together, SORT can suffer from identity switches.
+Dependence on Detection: The performance of SORT is highly dependent on the quality of the detections provided by the external object detector.
 
 \subsection{Simulation and Prototyping}
 Detection and tracking done in python with videos.
@@ -323,7 +473,7 @@ and thus the required torque $\tau$ is given by
 \textit{Mapping between pixels and real distance. Mosquito detection and tracking. Laser detection and tracking. \gls{pid} controller. Feedback for turret. Distinguishing between laser reflections.}
 
 \subsubsection{Mosquito and laser detection}
-It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame would be cropped such that only the back wall of the enclosure is visible.
+It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame would be cropped such that only the white back wall of the enclosure is visible.
 
 The detection system was designed to work with a red laser because the computational complexity could then be decreased by only considering the red channel of the \gls{rgb} frame.
 
@@ -336,50 +486,167 @@ The mosquito detection was designed to detect dark blobs in the enclosure and wo
     \label{fig:detection_process_flow}
 \end{figure}
 
-The only difference between the mosquito and laser detection is the binarisation step.
+The red channel of the \gls{rgb} frame will be extracted and a copy would be made such the image processing operations can be performed independently to detect both the mosquitoes and the laser.
 
 \paragraph{Binarisation}\mbox{}\\
-Thresholding or bg sub.
+The only difference between the mosquito and laser detection is the binarisation step. The red channel will be binarised using a threshold value. The binarisation will be using a greater than threshold value for the laser detection and a less than threshold value for the mosquito detection. The ideal result of the binarisation is a binary image with the laser and its reflections as foreground pixels and the background as background pixels, likewise for the mosquitoes. This will not be the case since the foreground pixels can not be perfectly isolated using a threshold value and frame will contain noise.
 
-\paragraph{Morphological operations}\mbox{}\\
-The respective binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations. Morphological operations work by passing a structuring element over the pixels in a image and performing a logical operation on the pixels in the image that are covered by the structuring element.
+\paragraph{Image enhancement}\mbox{}\\
+The respective binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations. Morphological operations work by passing a structuring element over the pixels in an image and performing a logical operation on the pixels in the image that are covered by the structuring element.
 
-The noise and erroneously joint sections are removed using the morphological opening operation. The opening of A by B is the union of all translations of B that are completely contained in A. This can be intuitively understood as illuminated in \autoref{fig:opening}.
+The noise and erroneously joint sections are removed using the morphological opening operation. Opening has been formally defined in \autoref{subsubsec:morphological_operations}. The opening of $A$ by $B$ is the union of all translations of $B$ that are completely contained in $A$ as illustrated in \autoref{fig:opening}. The holes and erroneously disjointed sections are removed using the morphological closing operation. Closing has been formally defined \autoref{subsubsec:morphological_operations}. The closing of $A$ by $B$ is the complement of the union of all translations of $B$ that do not overlap $A$ as illustrated in \autoref{fig:closing}.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/detection/opening.png}
-    \caption{The opening of A by B.}
-    \label{fig:opening}
-\end{figure}
+The goal of the morphological operations is to ensure that all the foreground pixels are connected and that there are no erroneously connected foreground pixels such that the connected sections can be identified. The connectivity of pixels will be explained in \autoref{par:ccl}. The structuring element B will be tuned to obtain the best results.
 
-The holes and erroneously disjointed sections are removed using the morphological closing operation. The closing of A by B is the complement of the union of all translations of B that do not overlap A. This can be intuitively understood as illuminated in \autoref{fig:closing}.
+\paragraph{Connected components labelling}\label{par:ccl}\mbox{}\\
+Once the processed binary image has been obtained the co-ordinates of the blobs need to be identified. This is done using \gls{ccl}. \Gls{ccl} is the process of assigning a label to each foreground pixel in a binary image such that connected pixels have the same label. The connectivity of pixels are defined using either four or eight connectivity. Four connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. Eight connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/detection/closing.png}
-    \caption{The closing of A by B.}
-    \label{fig:closing}
-\end{figure}
-
-The structuring element B will be tuned to obtain the best results.
-
-\paragraph{Connected components labelling}\mbox{}\\
-The connected components labelling algorithm labels the connected components in a binary image. The algorithm works by iterating over the pixels in the image and assigning a label to each pixel. The label of a pixel is determined by the labels of the pixels in its neighbourhood. The neighbourhood of a pixel can be defined using either four or eight connectivity. 4 connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. 8 connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
 % The algorithm is illustrated in \autoref{fig:connected_components_labelling}.
 
 \begin{figure}[h]
     \centering
-    \subfigure[Four connectivity.
-        \label{fig:four_connectivity}]
-    {\includegraphics[width=0.2\textwidth]{figures/detection/square_4_connectivity.png}}
-    \mbox{\hspace{1cm}}
-    \subfigure[Eight connectivity.
-        \label{fig:eight_connectivity}]
-    {\includegraphics[width=0.2\textwidth]{figures/detection/square_8_connectivity.png}}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.4\linewidth]{figures/detection/square_4_connectivity.png}
+        \caption{Four connectivity.}
+        \label{fig:four_connectivity}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.4\linewidth]{figures/detection/square_8_connectivity.png}
+        \caption{Eight connectivity.}
+        \label{fig:eight_connectivity}
+    \end{subfigure}
     \caption{Connected components labelling connectivity.}
     \label{fig:ccl_connectivity}
 \end{figure}
+
+Various algorithms exist to perform \gls{ccl}. Two of the most commonly used algorithms are the two-pass algorithm and the single-pass algorithm. The two-pass algorithm is generally faster for images with large connected components and the single-pass algorithm is generally faster for images with small connected components. The nature of the mosquito and laser detection is such that the connected components will be small, thus the single-pass algorithm was chosen. The single-pass algorithm is illustrated in \autoref{alg:single_pass_ccl}.
+
+\begin{algorithm}[H]
+    \caption{Single-Pass Connected Component Labeling}
+    \label{alg:single_pass_ccl}
+    \begin{algorithmic}[1]
+        \Procedure{SinglePassCCL}{$image$}
+        \State $rows, cols \gets \text{dimensions of } image$
+        \State $label \gets 1$
+        \State $labels \gets \text{2D array of zeros of size } rows \times cols$
+        \For{$y \gets 0$ to $rows-1$}
+        \For{$x \gets 0$ to $cols-1$}
+        \If{$image[y][x] = 1$ and $labels[y][x] = 0$}
+        \State $\text{ExploreBlob}(image, labels, x, y, label)$
+        \State $label \gets label + 1$
+        \EndIf
+        \EndFor
+        \EndFor
+        \EndProcedure
+        \State
+        \Procedure{ExploreBlob}{$image, labels, x, y, label$}
+        \State $queue \gets \text{empty queue}$
+        \State $\text{Enqueue}(queue, (x, y))$
+        \While{$\text{not empty}(queue)$}
+        \State $(x, y) \gets \text{Dequeue}(queue)$
+        \If{$x < 0$ or $x \geq cols$ or $y < 0$ or $y \geq rows$ or $image[y][x] = 0$ or $labels[y][x] > 0$}
+        \State \text{continue}
+        \EndIf
+        \State $labels[y][x] \gets label$
+        \For{each neighbor $(nx, ny)$ of $(x, y)$}
+        \State $\text{Enqueue}(queue, (nx, ny))$
+        \EndFor
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsubsection{Mosquito tracking}
+
+The mosquito tracking was performed using the \gls{sort} algorithm. The \gls{sort} algorithm is based on the tracking-by-detection paradigm, which means it relies on an external object detector. The object detector used was the mosquito detection algorithm described in \autoref{subsubsec:mosquito_detection}. The \gls{sort} algorithm associates the detections across frames to create tracks.
+
+\paragraph{Tracks}\mbox{}\\
+The mosquito tracks are created using the Kalman filter. The theoretical background of Kalman filter is discussed in \autoref{subsubsec:kalman_filter}. The kinematic equation representing the flight of a mosquito must be defined to determine the state space of the Kalman filter. The kinematic equation used to model the flight of a mosquito is
+\begin{equation}
+    \mathbf{x_{k} = x_{k-1} + \dot{x}_{k-1}}\Delta t + \frac{1}{2}\mathbf{\ddot{{x}}_{k-1}}\Delta t^2\,,
+\end{equation}
+where $\mathbf{x_{k}}$ is the position vector defined by the 2D pixel co-ordinate of a mosquito $\begin{bmatrix} x & y \end{bmatrix}^\mathrm{T}$. A constant velocity model with acceleration as noise will be used since mosquitoes have an erratic flight pattern. Therefore, the set of differential equations describing the state space of the Kalman filter is
+\begin{equation}
+    \begin{aligned}
+        \mathbf{x}_k
+         & = \mathbf{Ax}_{k-1} + \mathbf{Bu}_k + \mathbf{w}_k \\
+        \begin{bmatrix}
+            x_k       \\
+            y_k       \\
+            \dot{x}_k \\
+            \dot{y}_k
+        \end{bmatrix}
+         & =
+        \begin{bmatrix}
+            x_{k-1}+\dot{x}_{k-1} \Delta t \\
+            y_{k-1}+\dot{y}_{k-1} \Delta t \\
+            \dot{x}_{k-1}                  \\
+            \dot{y}_{k-1}
+        \end{bmatrix}\,.
+    \end{aligned}
+\end{equation}
+
+The state is $\mathbf{x} = \begin{bmatrix} x & y & \dot{x} & \dot{y} \end{bmatrix}^\mathrm{T}$ and the state transition matrix is
+\begin{equation}
+    \label{eq:kalman_filter_state_transition_matrix}
+    A = \begin{bmatrix}
+        1 & 0 & \Delta t & 0        \\
+        0 & 1 & 0        & \Delta t \\
+        0 & 0 & 1        & 0        \\
+        0 & 0 & 0        & 1
+    \end{bmatrix}\,.
+\end{equation}
+The position of a mosquito is the only component of the state the is measured by the detection system. Thus, the observation matrix $H$ is given by
+\begin{equation}
+    \label{eq:kalman_filter_observation_matrix}
+    H = \begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0
+    \end{bmatrix}\,.
+\end{equation}
+
+The error in the constant velocity model of The process noise covariance matrix $Q$ is given by
+\begin{equation}
+    Q = \begin{bmatrix}
+        \sigma_{x}^2               & 0                          & \sigma_{x}\sigma_{\dot{x}} & 0                          \\
+        0                          & \sigma_{y}^2               & 0                          & \sigma_{y}\sigma_{\dot{y}} \\
+        \sigma_{\dot{x}}\sigma_{x} & 0                          & \sigma_{\dot{x}}^2         & 0                          \\
+        0                          & \sigma_{\dot{y}}\sigma_{y} & 0                          & \sigma_{\dot{y}}^2
+    \end{bmatrix}
+    \label{eq:kalman_filter_process_noise_covariance_matrix}
+\end{equation}
+
+where $\sigma_{x}$ and $\sigma_{\dot{x}}$ are the standard deviations of the position and velocity, respectively. The standard deviation of the position is defined as the standard deviation of the acceleration $\sigma_a$ multiplied by $\sfrac{1}{2}\Delta t^2$ since this is the effect that the acceleration will have on the position as shown in
+
+The measurement noise covariance matrix $R$ is given by
+
+\begin{equation}
+    R = \begin{bmatrix}
+        \sigma_{x}^2 & 0            \\
+        0            & \sigma_{y}^2
+    \end{bmatrix}
+    \label{eq:kalman_filter_measurement_noise_covariance_matrix}
+\end{equation}
+
+where $\sigma_{x}^2$ and $\sigma_{y}^2$ are the variances of the measurement noise. The initial state covariance matrix $P$ is given by
+
+\begin{equation}
+    P = \begin{bmatrix}
+        \sigma_{x}^2 & 0            & 0                  & 0                  \\
+        0            & \sigma_{y}^2 & 0                  & 0                  \\
+        0            & 0            & \sigma_{\dot{x}}^2 & 0                  \\
+        0            & 0            & 0                  & \sigma_{\dot{y}}^2
+    \end{bmatrix}
+    \label{eq:kalman_filter_initial_state_covariance_matrix}
+\end{equation}
+
+where $\sigma_{x}^2$, $\sigma_{y}^2$, $\sigma_{\dot{x}}^2$, and $\sigma_{\dot{y}}^2$ are the variances of the initial state. The variances of the process noise and the measurement noise were tuned to obtain the best results.
+
+\paragraph{Association}\mbox{}\\
+
 
 \subsection{Software implementation and optimisation}
 Only using red channel, \gls{gpu}, low resolution, etc.
