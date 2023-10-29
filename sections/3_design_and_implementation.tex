@@ -87,10 +87,9 @@ To control the laser, its position must be known in the world co-ordinate frame.
 
 Using the forward imaging model the pixel distance was mapped to the metric distance for the x-axis with
 \begin{equation}
-    X = Z \times \left( \frac{x - x_{ref}}{f_x} \right)
+    X = Z \times \left( \frac{x - x_{ref}}{f_x} \right)\,,
     \label{eq:pixel_to_metric}
 \end{equation}
-
 where $Z$ is the depth camera with respect to the world co-ordinate frame, $x$ is the pixel of interest, $x_{ref}$ is the reference pixel, and $f_x$ is the effective focal length of the camera. Similarly, the pixel distance was mapped to the metric distance for the y-axis.
 
 The effective focal length of the camera $f_x$ was determined through camera calibration.
@@ -130,14 +129,11 @@ They represent the position and orientation of the camera relative to the world 
 
 \subsubsection{Morphological operations}
 \label{subsubsec:morphological_operations}
-
 Erosion is a fundamental morphological operation used to remove small structures or details from a binary image. It is defined as the basic set operation of moving a structuring element (usually a smaller binary matrix) over the input binary image and finding the intersection of the structuring element with the image. This operation can be mathematically expressed as
-
 \begin{equation}
-    (A \ominus B)(x, y) = \bigcap \{A(x + i, y + j) | (i, j) \in B\}
+    (A \ominus B)(x, y) = \bigcap \{A(x + i, y + j) | (i, j) \in B\}\,,
     \label{eq:erosion}
 \end{equation}
-
 where
 \begin{itemize}
     \item $A$ is the input binary image.
@@ -147,12 +143,10 @@ where
 \end{itemize}
 
 Dilation is another fundamental morphological operation, but it is used to enhance or grow the features in a binary image. Dilation can be defined as the set operation that moves the structuring element over the input image and computes the union of the element with the parts of the image where the structuring element "hits". The mathematical expression for dilation is as follows:
-
 \begin{equation}
     (A \oplus B)(x, y) = \bigcup \{A(x + i, y + j) | (i, j) \in B\}
     \label{eq:dilation}
 \end{equation}
-
 where
 \begin{itemize}
     \item $A$ is the input binary image.
@@ -162,7 +156,6 @@ where
 \end{itemize}
 
 The erosion and dilation operations are illustrated in \autoref{fig:erosion_and_dilation}.
-
 \begin{figure}[h]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
@@ -171,6 +164,7 @@ The erosion and dilation operations are illustrated in \autoref{fig:erosion_and_
         \caption{The erosion of the dark-blue square by a disk, resulting in the light-blue square.}
         \label{fig:erosion}
     \end{subfigure}
+    \quad
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
         \includegraphics[width=0.5\linewidth]{figures/detection/dilation.png}
@@ -182,12 +176,10 @@ The erosion and dilation operations are illustrated in \autoref{fig:erosion_and_
 \end{figure}
 
 Opening is a compound morphological operation that consists of an erosion followed by a dilation using the same structuring element. It is primarily used to remove noise and small objects from a binary image. The opening of an image $A$ by a structuring element $B$ is defined as
-
 \begin{equation}
-    A \circ B = (A \ominus B) \oplus B
+    A \circ B = (A \ominus B) \oplus B\,,
     \label{eq:opening}
 \end{equation}
-
 where
 \begin{itemize}
     \item $A$ is the input binary image.
@@ -196,12 +188,10 @@ where
 \end{itemize}
 
 Closing is another compound morphological operation that consists of dilation followed by an erosion using the same structuring element. It is used to close small holes and gaps in objects and to connect nearby objects. The closing of an image $A$ by a structuring element $B$ is defined as
-
 \begin{equation}
-    A \bullet B = (A \oplus B) \ominus B
+    A \bullet B = (A \oplus B) \ominus B\,,
     \label{eq:closing}
 \end{equation}
-
 where
 \begin{itemize}
     \item $A$ is the input binary image.
@@ -210,7 +200,6 @@ where
 \end{itemize}
 
 Opening and closing are both idempotent operations, meaning that repeated openings or closing have no effect on the image. Opening and closing is illustrated in \autoref{fig:opening_and_closing}.
-
 \begin{figure}[h]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
@@ -219,6 +208,7 @@ Opening and closing are both idempotent operations, meaning that repeated openin
         \caption{The opening of the dark-blue square by a disk, resulting in the light-blue square with round corners.}
         \label{fig:opening}
     \end{subfigure}
+    \quad
     \begin{subfigure}[t]{0.45\textwidth}
         \centering
         \includegraphics[width=0.5\linewidth]{figures/detection/closing.png}
@@ -280,19 +270,52 @@ Occlusions: SORT can struggle with objects that are occluded or interact closely
 Identity Switches: In cases where objects cross paths or are close together, SORT can suffer from identity switches.
 Dependence on Detection: The performance of SORT is highly dependent on the quality of the detections provided by the external object detector.
 
+
+
+
 \subsection{Simulation and Prototyping}
 Detection and tracking done in python with videos.
+
+
 
 
 \subsection{Hardware design}
 \textit{Turret inspired by 2d laser scanners. Motor step resolution, speed, and torque calculations. Motor driver selection based on microstepping capabilities. Turret CAD design. Math translation between angle and distance of laser.}
 
-\subsubsection{Mosquito enclosure and system positioning}
-\newcommand{\enclosureWidthCM}{90} % cm
-\newcommand{\enclosureHeightCM}{38} % cm
-\newcommand{\enclosureDepthCM}{32} % cm
+The hardware overview is presented in \autoref{fig:hardware_overview}. The hardware consists primarily of a laser turret, a camera, a mosquito enclosure, and an embedded processing platform. The laser turret is used to move the laser beam across the mosquito enclosure. The camera is used to detect the laser beam and the mosquitoes. A bracket is used to position the laser turret and the camera relative to the mosquito enclosure. The embedded processing platform is used to control the laser turret and perform the image processing required for the laser detection and mosquito detection.
 
-The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. Internal lighting was added to the enclosure to ensure contrast between the background and the mosquitoes and to minimise the camera noise. The laser turret and the camera were placed outside the enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, was designed to hold the laser turret and the camera in place relative to the mosquito enclosure.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\textwidth]{figures/hardware_design/hardware_overview.pdf}
+    \caption{Hardware overview.}
+    \label{fig:hardware_overview}
+\end{figure}
+
+
+
+\subsubsection{Embedded platform selection}
+To select an embedded platform for the project the following requirements were considered:
+
+\begin{description}[style=nextline]
+    \item[Processing power] The embedded platform must be able to perform the image processing required for the laser detection and mosquito detection in real-time. Image processing is computationally intensive, but can largely benefit from parallelisation. Therefore, an embedded platform with a \gls{gpu} will be preferred.
+    \item[Memory] The embedded platform must have sufficient memory to store the multiple images along with the required algorithms. A 1080p image with 3 8-bit colour channels requires 6 MB of memory.
+    \item[Hardware interfaces] The embedded platform must be compatible with camera interfaces. It must also have sufficient \gls{gpio} pins to interface with the stepper motor drivers. The embedded platform must also have support for a display output and a keyboard and mouse input to provide a user interface to control the system.
+    \item[Availability and support] It is import to select an embedded platform that is readily available. It is important to select an embedded platform with large body of knowledge available and sufficient scientific support community since this is an individual project without access to people with expertise with the embedded platform.
+\end{description}
+
+The Nvidia Jetson Nano was chosen as the embedded platform for the project. The Nvidia Jetson Nano is a single-board computer with a \gls{gpu} and a quad-core \gls{cpu}. The Nvidia Jetson Nano has a \gls{mipi} \gls{csi}-2 camera interface and has 40 \gls{gpio} pins. The Jetson Nano has a quad-core ARM Cortex-A57 MPCore processor, an Nvidia Maxwell \gls{gpu} with 128 \gls{cuda} cores, and 4 GB of LPDDR4 memory. It also features an HDMI display output and a \gls{usb} 3.0 port. The Nvidia Jetson Nano is readily available and has a large body of knowledge available and sufficient scientific support community.
+
+
+
+\subsubsection{Camera selection}
+To minimise the computational complexity of the image processing required for the laser detection and mosquito detection a low resolution will be used. The video resolution will not need to exceed 1080p. The camera must be able to capture images at a frame rate of at least 30 frames per second. The camera must also be compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano.
+
+The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The Raspberry Pi Camera Module V2 is an 8 MP camera that can capture images at a frame rate of 30 frames per second at 1080p. The Raspberry Pi Camera Module V2 is compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano.
+
+
+
+\subsubsection{Mosquito enclosure}
+The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosquito_enclosure_dimensions}. The width of the enclosure must be a minimum length of 1 metre. The front facing surface will be transparent and the rest of the surfaces will be white. The enclosure will be fitted with internal lighting to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
 
 \begin{figure}[h]
     \centering
@@ -301,6 +324,10 @@ The mosquitoes were placed inside an enclosure with a white lining and a glass f
     \label{fig:mosquito_enclosure_dimensions}
 \end{figure}
 
+
+\subsubsection{System positioning}
+The laser turret and the camera will be placed outside the mosquito enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, will be built to hold the laser turret and the camera in place relative to the mosquito enclosure.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/positioning_bracket.png}
@@ -308,14 +335,10 @@ The mosquitoes were placed inside an enclosure with a white lining and a glass f
     \label{fig:system_positioning_bracket}
 \end{figure}
 
-\subsubsection{Laser turret design}
 
-The laser turret design was inspired by commercial two-axis laser scanners. A schematic for a typical two-axis laser scanner can be seen in \autoref{fig:two-axis-scanner-schematic}. The mirrors \hl{are} connected directly to the output shaft of the motor. The origin of the laser turret \hl{is} where the laser beam shines orthogonal to the mosquito plane, which occurs when the two mirrors \hl{are} at 45$\degree$ relative to the angle of the laser beam when the origin of the laser beam is parallel to the mosquito plane. When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the mosquito plane as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $\pm x$ from the origin of the laser turret can be calculated using
-\begin{equation}
-    \theta = \arctan{\left(\frac{\pm x}{z}\right)}
-    \label{eq:mirror_angle}
-\end{equation}
-where $z$ is the distance between the turret and the mosquito plane.
+
+\subsubsection{Laser turret}
+The laser turret design was inspired by commercial two-axis laser scanners. The position of the laser beam is controlled by adjusting the angles of two mirrors. This is illustrated in \autoref{fig:two-axis-scanner-schematic}. The mirrors are connected directly to the output shaft of the motors. The laser turret will be positioned orthogonally to the $xy$-plane of the mosquito enclosure. The point where the laser beam shines orthogonal to the $xy$-plane of the mosquito enclosure is considered the origin of the laser. This will occur when the two mirrors are at 45$\degree$ relative to the laser beam.
 
 \begin{figure}[h]
     \centering
@@ -324,6 +347,13 @@ where $z$ is the distance between the turret and the mosquito plane.
     \label{fig:two-axis-scanner-schematic}
 \end{figure}
 
+When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the $xy$-plane mosquito enclosure as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $d$ relative to the origin of the laser can be calculated using
+\begin{equation}
+    \theta = \arctan{\left(\frac{d}{z}\right)}\,,
+    \label{eq:mirror_angle}
+\end{equation}
+where $z$ is the distance between the turret and the back wall of the mosquito enclosure.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/mirror_angle.png}
@@ -331,40 +361,45 @@ where $z$ is the distance between the turret and the mosquito plane.
     \label{fig:mirror_angle}
 \end{figure}
 
-The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the mosquito plane, while maintaining sufficient speed.
 
-\paragraph{Lateral step size and speed}\mbox{}\\
+
+
+
+\paragraph{Required lateral step size}\mbox{}\\
 \newcommand{\requiredLatStepSizeMM}{2} % mm
 The lateral step size of the laser must be on the order of $\requiredLatStepSizeMM$ mm (size of mosquito plus size of laser).
 
+
+\paragraph{Required lateral speed}\mbox{}\\
 \newcommand{\requiredLatSpeedMPS}{1} % m/s
-The required lateral speed is determined in accordance with the field specifications the longest length of the mosquito enclosure \hl{is} \hl{1~m}. To ensure that the laser could illuminate the set point within \hl{2} seconds of receiving a step input it was assumed that the laser must be able to move with a velocity $v$ of least \requiredLatSpeedMPS~m/s opposed to 0.5~m/s required to move the 1~m length of the mosquito enclosure within 2 seconds. This was done to accommodate for the settling time of the control system. This is also faster than the top speed of a mosquito which is 0.67~m/s according to SOURCE.
+The required lateral speed is determined in accordance with the field specifications. The longest length of the mosquito enclosure $d_{max}$ will be $\SI{1}{\meter}$. To ensure that the laser can illuminate any set point inside the mosquito enclosure within $\SI{2}{\second}$ of receiving a step input, it was assumed that the laser must be able to move with a velocity $v_{laser}$ of least $\SI{\requiredLatSpeedMPS}{\meter\per\second}$ opposed to the $\SI{0.5}{\meter\per\second}$ required to move the $\SI{1}{\meter}$ length of the mosquito enclosure within $\SI{2}{\second}$. This was done to accommodate for the settling time of the laser turret control system.
+%This is also faster than the top speed of a mosquito which is 0.67~m/s.
 
-\paragraph{Lateral to angular step size}\mbox{}\\
-\label{par:lateral_to_angular_step_size}
-In the design of the laser turret there were multiple dimensions that were dependent on each other, it is up to the designer to choose certain practical dimensions from which the rest of the dimensions can be calculated. In this design the dimensions of the mirrors were chosen for practicality as $30 \times 15$ mm. These dimensions will be used throughout the rest of the design.
 
-The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate from the origin (45$\degree$ point) is $\theta_{max} =\pm 20\degree$ (add conservatively estimated) resulting in a $40\degree$ range of motion. This was determined geometrically in \autoref{fig:turret_motion_range}. The lines representing the mirrors in \autoref{fig:turret_motion_range} are 30~mm long and the whole figure is drawn to scale. The rotation range of the second axis is not bounded by the geometry of the turret since the laser beam reflected from the second axis is incident on the mosquito plane. Therefore, the turret was oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
 
-To maximise the angle through which the turret must rotate to move the laser beam across the height of the mosquito enclosure the minimum distance $z_{min}$ between the turret and the mosquito plane was determined by rearranging \autoref{eq:mirror_angle} to give
-\begin{equation}
-    z = \frac{\pm x}{\tan{\theta}}.
-    \label{eq:distance_calculation}
-\end{equation}
-where $x = \enclosureHeightCM$~cm is the height of the mosquito enclosure. The minimum distance $z_{min}$ was calculated by substituting $\theta_max = 20\degree$ into \autoref{eq:distance_calculation} to give
+\subsection{Hardware implementation}
+\gls{gpio} interfacing with stepper motor driver.
 
-\FPeval{\zMinCM}{round(\enclosureHeightCM/tan(20*pi/180), 1)}
-\begin{equation}
-    z_{min} = \frac{\enclosureHeightCM \text{cm}}{\tan{20\degree}} = \zMinCM. \text{cm}.
-    \label{eq:z_min_calculation}
-\end{equation}
 
-The required motor step resolution was calculated by substituting $x_{min}$ and $z_{min}$ into \autoref{eq:mirror_angle} to give
-\pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
-\begin{equation}
-    \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \stepRes\degree
-    \label{eq:step_resolution_calculation}
-\end{equation}
+
+\subsubsection{Mosquito enclosure}
+\newcommand{\enclosureWidthCM}{90} % cm
+\newcommand{\enclosureHeightCM}{38} % cm
+\newcommand{\enclosureDepthCM}{32} % cm
+
+The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. Internal lighting was added to the enclosure to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
+
+
+
+\subsubsection{Laser turret}
+The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the back wall of the mosquito enclosure, while maintaining sufficient speed.
+
+The dimensions of the mirrors were chosen for practicality as $30 \times 15$~mm.
+
+
+\label{par:angular_step_size}
+\paragraph{Angular step size}\mbox{}\\
+The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$. This was conservatively determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
 
 \begin{figure}[h]
     \centering
@@ -373,123 +408,107 @@ The required motor step resolution was calculated by substituting $x_{min}$ and 
     \label{fig:turret_motion_range}
 \end{figure}
 
-\paragraph{Lateral speed to angular speed}\mbox{}\\
-From \autoref{par:lateral_to_angular_step_size} it is known that
-\pgfmathsetmacro{\enclosureHeightM}{\enclosureHeightCM/100}\enclosureHeightM
+The minimum distance $z_{min}$ between the laser turret and the mosquito enclosure can be determined by rearranging \autoref{eq:mirror_angle} to give
+\FPeval{\zMinCM}{round(\enclosureHeightCM/tan(40*pi/180), 1)}
 \begin{equation}
-    \begin{aligned}
-                 & \SI{\enclosureHeightM}{\meter\per\second} = \SI{40}{\degree\per\second}                                                            \\
-        \implies & \enclosureHeightM \times \frac{\requiredLatSpeedMPS}{\enclosureHeightM} = 40 \times \frac{\requiredLatSpeedMPS}{\enclosureHeightM} \\
-        \implies & \SI{\requiredLatSpeedMPS}{\meter\per\second} = \pgfmathsetmacro{\result}{40/\enclosureHeightM} \SI{\result}{\per\second}
-    \end{aligned}
+    z_{min} = \frac{d}{\tan\left(\theta\right)} = \frac{\enclosureHeightCM \text{ cm}}{\tan\left(40\degree\right)} = \zMinCM \text{ cm}\,,
 \end{equation}
-The angular speed required to move the laser beam at a lateral speed $v = \SI{\requiredLatSpeedMPS}{\meter\per\second}$ was calculated with $\theta_{max}$ determined in \autoref{par:lateral_to_angular_step_size} using
+where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta = 40\degree$ is the maximum angle through which the first axis of the laser turret can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into \autoref{eq:mirror_angle} to produce
+\pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
 \begin{equation}
-    \omega = v \times \theta_{max}.
-    \label{eq:angular_velocity_calculation}
+    \theta_{step}^{max} = \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \stepRes\degree\,.
+    \label{eq:max_step_resolution}
 \end{equation}
 
-% Thus, the required angular velocity $\omega_f$ is given by (if assumed that the first axis will cover the width, thus it must actually be faster)
-% \begin{equation}
-%   \omega_f = v \times \theta = 1 \text{m/s} \times 40\degree \times \frac{\pi}{180} = 0.698 \text{rad/s}.
-%   \label{eq:angular_velocity_calculation}
-% \end{equation}
 
-
+\paragraph{Angular speed}\mbox{}\\
+The maximum angular speed $\omega_{max}$ required by the motors can be determined with $d_{max}$, $v_{laser}$, and $z_{min}$. The maximum angle through which the turret must rotate is
+\begin{equation}
+    \theta_{max} = \arctan\left({\frac{d_{max}}{z_{min}}}\right) = \arctan\left({\frac{\SI{1}{\meter}}{\zMinCM \text{ cm}}}\right) = 65.6\degree\,.
+\end{equation}
+The maximum angular speed required to move the laser beam at the lateral speed $v_{laser} = \SI{\requiredLatSpeedMPS}{\meter\per\second}$ is
+\begin{equation}
+    \omega_{max} = v_{laser} \times \theta_{max} = \SI{65.6}{\degree\per\second} = \SI{1.14}{\radian\per\second}\,.
+\end{equation}
 
 
 
 \subsubsection{Motor requirements}
-\sout{The motor requirements were determined based on system requirement 4 (The laser must be able to illuminate the set point within 2 seconds accurate to within 1~mm.).}
+The required torque and \gls{rpm} were calculated to enable appropriate motor selection.
 
-The need for precise position control of the laser meant that only stepper and servo motors were considered. The required torque and required \gls{rpm} was calculated to enable appropriate motor selection. \sout{and the resulting laser step size on the mosquito plane were calculated.} In the calculations only a single axis of the turret was considered since the motors and mirrors for both axes \hl{will be} identical and operate independently.
 
-\begin{figure}
+\paragraph{Torque}\mbox{}\\
+The required torque $\tau$ was calculated using
+\begin{equation}
+    \tau = I\alpha\,,
+    \label{eq:torque}
+\end{equation}
+where $I$ is the moment of inertia of the load, which is the mirror, and $\alpha$ is the required angular acceleration.
+
+\begin{figure}[h]
     \centering
     \includegraphics[scale=1]{figures/hardware_design/cylinder_central_axis.png}
     \caption{Central axis of a cylinder.}
     \label{fig:cylinder_central_axis}
 \end{figure}
 
-The required torque $\tau$ was calculated using
+The moment of inertia for the mirror was calculated by assuming the mirror is solid cylinder with diameter equal to the width of the mirror. This will produce an inflated moment of inertia, however, this is not a concern since having extra torque is not a problem. The moment of inertia $I$ of a cylinder with rotation about its central axis as seen in \autoref{fig:cylinder_central_axis} is given by
 \begin{equation}
-    \tau = I\alpha
-    \label{eq:torque}
+    I = \frac{1}{2}Mr^2\,,
 \end{equation}
-where $I$ is the moment of inertia and $\alpha$ is the angular acceleration.
-
-The moment of inertia for the mirror was calculated by \hl{assuming} the mirror was solid cylinder with diameter $d$ equal to the width of the mirror. This will produce an inflated moment of inertia, however, this is not a concern since having extra torque is not a problem. The moment of inertia $I$ of a cylinder with rotation about its central axis as seen in \autoref{fig:cylinder_central_axis} is given by
+where $M$ is the mass of the cylinder and $r$ is the radius of the cylinder. The mass of the cylinder $M$ will be calculated using the density of glass $\rho = \SI{2500}{\kg\per\meter\cubed}$ and the volume of the cylinder $V$ given by
 \begin{equation}
-    I = \frac{1}{2}Mr^2
-    \label{eq:moment_of_inertia}
+    V = \pi r^2 h\,.
 \end{equation}
-where $M$ is the mass of the cylinder and $r = \sfrac{d}{2}$ is the radius of the cylinder. The mass of the cylinder $M$ was calculated using the density of glass $\rho = 2500 \text{kg/m}^3$ and the volume of the cylinder $V$ given by
+The height $h$ and radius $r$ of the cylinder is given by the chosen mirror dimensions as $h = 30 \text{ mm}$ and $r = 7.5 \text{ mm}$. The mass of the mirror $M$ is
 \begin{equation}
-    V = \pi r^2 h.
-    \label{eq:cylinder_volume}
+    M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times \pi \left(7.5 \text{ mm}\right)^2 (30 \text{ mm}) = 13.25 \text{ g}\,.
 \end{equation}
-The height $h$ and radius $r$ of the cylinder was determined by assuming practical dimensions for the mirror. The dimensions of the mirror was assumed to be 30~mm by 15~mm. Thus, the mass of the mirror $M$ is given by
+Thus, the moment of inertia of the mirror is
 \begin{equation}
-    M = \rho V = 2500 \text{kg/m}^3 \times \pi \left(\frac{0.015}{2} \text{m}\right)^2 0.03 \text{m} = 0.01325 \text{kg} = 13.25 \text{g}.
-    \label{eq:cylinder_mass}
-\end{equation}
-Given the above assumptions, the moment of inertia $I$ was calculated as
-\begin{equation}
-    I = \frac{1}{2}Mr^2 = \frac{1}{2} \times 0.01325 \text{kg} \times \left(\frac{0.015}{2} \text{m}\right)^2 = 1.172 \times 10^{-7} \text{kg} \cdot \text{m}^2.
-    \label{eq:cylinder_moment_of_inertia}
+    I = \frac{1}{2}Mr^2 = \frac{1}{2}(13.25 \text{ g})(7.5 \text{ mm})^2 = \SI{3.73e-7}{\kg\per\meter\squared}\,.
 \end{equation}
 
-The angular acceleration of the motor $\alpha$ is calculated by
+The angular acceleration of the motor $\alpha$ is calculated with
 \begin{equation}
-    \alpha = \frac{\Delta\omega}{\Delta t}
-    \label{eq:angular_acceleration}
+    \alpha = \frac{\Delta\omega}{\Delta t}\,,
 \end{equation}
-where $\Delta\omega = \omega_f - \omega_i$ is the change in angular velocity and $\Delta t$ is the change in time.  This velocity was translated into the angular velocity $\omega_f$ using
+where $\Delta\omega = \omega_{max} - 0$ is the change in angular velocity and $\Delta t$ is the change in time. The change in time $\Delta t$ was determined by assuming the laser must be able to accelerate from a stand still to $v_{laser} = \SI{1}{\meter\per\second}$ extremely rapidly to ensure that the motors could respond to the irregular flight pattern of a mosquito. It was assumed that this acceleration must occur within 10~ms. Thus, the required angular acceleration $\alpha$ is
 \begin{equation}
-    \omega = v \times \theta_{max}
-    \label{eq:angular_velocity}
+    \alpha = \frac{\Delta\omega}{\Delta t} = \frac{\SI{1.14}{\radian\per\second}}{\SI{0.01}{\second}} = \SI{114}{\radian\per\second\squared}\,.
 \end{equation}
-where $\theta_{max}$ is the angle through which the mirror must rotate to produce a 1~m lateral displacement of the laser on the mosquito plane.
 
-The change in time $\Delta t$ was determined by assuming the laser must be able to accelerate from a stand still to 1~m/s extremely rapidly to ensure that the motors could respond to the irregular flight pattern associated with a mosquito. It was assumed that this acceleration must occur within 10~ms.
-
-Thus, the required angular acceleration $\alpha$ is given by
+Finally, the required torque $\tau$ is
 \begin{equation}
-    \alpha = \frac{\Delta\omega}{\Delta t} = \frac{0.698 \text{rad/s}}{0.01 \text{s}} = 69.8 \text{rad/s}^2.
-    \label{eq:angular_acceleration_calculation}
-\end{equation}
-and thus the required torque $\tau$ is given by
-\begin{equation}
-    \tau = I\alpha = 1.172 \times 10^{-7} \text{kg} \cdot \text{m}^2 \times 69.8 \text{rad/s}^2 = 8.17 \times 10^{-6} \text{N} \cdot \text{m}.
-    \label{eq:torque_calculation}
+    \tau = I\alpha = \SI{3.73e-7}{\kg\per\meter\squared} \times \SI{114}{\radian\per\second\squared} = \SI{4.35e-5}{\newton\meter}\,.
 \end{equation}
 
 
-\subsection{Hardware implementation}
-\gls{gpio} interfacing with stepper motor driver.
 
 
 \subsection{Software design}
 \textit{Mapping between pixels and real distance. Mosquito detection and tracking. Laser detection and tracking. \gls{pid} controller. Feedback for turret. Distinguishing between laser reflections.}
 
-\subsubsection{Mosquito and laser detection}
+
+
+\subsubsection{Mosquito and laser detection} \label{subsubsec:mosquito_and_laser_detection}
 It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame would be cropped such that only the white back wall of the enclosure is visible.
 
 The detection system was designed to work with a red laser because the computational complexity could then be decreased by only considering the red channel of the \gls{rgb} frame.
 
 The mosquito detection was designed to detect dark blobs in the enclosure and would not be able to distinguish between mosquitoes and other dark blobs. The laser detection was designed to detect bright blobs in the enclosure and would not be able to distinguish between the laser and its reflections. The mosquito and laser detection processes are similar in nature. The basic detection process flow is shown in \autoref{fig:detection_process_flow}.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/detection/detection_process_flow.pdf}
     \caption{Detection process flow.}
     \label{fig:detection_process_flow}
 \end{figure}
-
 The red channel of the \gls{rgb} frame will be extracted and a copy would be made such the image processing operations can be performed independently to detect both the mosquitoes and the laser.
+
 
 \paragraph{Binarisation}\mbox{}\\
 The only difference between the mosquito and laser detection is the binarisation step. The red channel will be binarised using a threshold value. The binarisation will be using a greater than threshold value for the laser detection and a less than threshold value for the mosquito detection. The ideal result of the binarisation is a binary image with the laser and its reflections as foreground pixels and the background as background pixels, likewise for the mosquitoes. This will not be the case since the foreground pixels can not be perfectly isolated using a threshold value and frame will contain noise.
+
 
 \paragraph{Image enhancement}\mbox{}\\
 The respective binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations. Morphological operations work by passing a structuring element over the pixels in an image and performing a logical operation on the pixels in the image that are covered by the structuring element.
@@ -498,22 +517,22 @@ The noise and erroneously joint sections are removed using the morphological ope
 
 The goal of the morphological operations is to ensure that all the foreground pixels are connected and that there are no erroneously connected foreground pixels such that the connected sections can be identified. The connectivity of pixels will be explained in \autoref{par:ccl}. The structuring element B will be tuned to obtain the best results.
 
+
 \paragraph{Connected components labelling}\label{par:ccl}\mbox{}\\
 Once the processed binary image has been obtained the co-ordinates of the blobs need to be identified. This is done using \gls{ccl}. \Gls{ccl} is the process of assigning a label to each foreground pixel in a binary image such that connected pixels have the same label. The connectivity of pixels are defined using either four or eight connectivity. Four connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. Eight connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
 
-% The algorithm is illustrated in \autoref{fig:connected_components_labelling}.
-
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[t]{0.45\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
         \centering
-        \includegraphics[width=0.4\linewidth]{figures/detection/square_4_connectivity.png}
+        \includegraphics[width=0.5\linewidth]{figures/detection/square_4_connectivity.png}
         \caption{Four connectivity.}
         \label{fig:four_connectivity}
     \end{subfigure}
-    \begin{subfigure}[t]{0.45\textwidth}
+    \quad
+    \begin{subfigure}[b]{0.3\textwidth}
         \centering
-        \includegraphics[width=0.4\linewidth]{figures/detection/square_8_connectivity.png}
+        \includegraphics[width=0.5\linewidth]{figures/detection/square_8_connectivity.png}
         \caption{Eight connectivity.}
         \label{fig:eight_connectivity}
     \end{subfigure}
@@ -523,8 +542,8 @@ Once the processed binary image has been obtained the co-ordinates of the blobs 
 
 Various algorithms exist to perform \gls{ccl}. Two of the most commonly used algorithms are the two-pass algorithm and the single-pass algorithm. The two-pass algorithm is generally faster for images with large connected components and the single-pass algorithm is generally faster for images with small connected components. The nature of the mosquito and laser detection is such that the connected components will be small, thus the single-pass algorithm was chosen. The single-pass algorithm is illustrated in \autoref{alg:single_pass_ccl}.
 
-\begin{algorithm}[H]
-    \caption{Single-Pass Connected Component Labeling}
+\begin{algorithm}[h]
+    \caption{Single-Pass Connected Component Labelling}
     \label{alg:single_pass_ccl}
     \begin{algorithmic}[1]
         \Procedure{SinglePassCCL}{$image$}
@@ -559,97 +578,153 @@ Various algorithms exist to perform \gls{ccl}. Two of the most commonly used alg
 \end{algorithm}
 
 
-\subsubsection{Mosquito tracking}
 
-The mosquito tracking was performed using the \gls{sort} algorithm. The \gls{sort} algorithm is based on the tracking-by-detection paradigm, which means it relies on an external object detector. The object detector used was the mosquito detection algorithm described in \autoref{subsubsec:mosquito_detection}. The \gls{sort} algorithm associates the detections across frames to create tracks.
+\subsubsection{Distinguishing between the laser reflections}
+The laser must shine through the front glass of the mosquito enclosure. This results in various reflections of the laser beam. There are three predominate reflections that can not be distinguished using a brightness threshold. These reflections are:
+\begin{itemize}
+    \item The reflection of the laser beam off the front glass at the origin of the laser turret, resulting from scattered light off the turret mirrors.
+    \item The reflection of the laser beam incident on the front glass.
+    \item The reflection of interest, which is the reflection of the laser beam incident on a mosquito or the back wall of the enclosure.
+\end{itemize}
+
+The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors adjusted. The remaining two reflections are distinguished using the geometric properties of the hardware setup. The $yz$-plane of the hardware setup is shown in \autoref{fig:distinguish_lasers}. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin then the reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\linewidth]{figures/distinguish_lasers.png}
+        \caption{Laser reflections.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\linewidth]{figures/distinguish_lasers_zoomed_inflection.png}
+        \caption{Laser reflections zoomed in on the inflection point.}
+    \end{subfigure}
+    \caption{Distinguishing between the laser reflections.}
+    \label{fig:distinguish_lasers}
+\end{figure}
+
+
+
+\subsubsection{Mosquito tracking}
+The mosquito tracking was performed using the \gls{sort} algorithm. The \gls{sort} algorithm is based on the tracking-by-detection paradigm, which means it relies on an external object detector. The object detector used was the mosquito detection algorithm described in \autoref{subsubsec:mosquito_and_laser_detection}. The \gls{sort} algorithm associates the detections across frames to create tracks.
+
 
 \paragraph{Tracks}\mbox{}\\
 The mosquito tracks are created using the Kalman filter. The theoretical background of Kalman filter is discussed in \autoref{subsubsec:kalman_filter}. The kinematic equation representing the flight of a mosquito must be defined to determine the state space of the Kalman filter. The kinematic equation used to model the flight of a mosquito is
 \begin{equation}
-    \mathbf{x_{k} = x_{k-1} + \dot{x}_{k-1}}\Delta t + \frac{1}{2}\mathbf{\ddot{{x}}_{k-1}}\Delta t^2\,,
+    \label{eq:mosquito_kinematic_equation}
+    \mathbf{x}_{k} = \mathbf{x}_{k-1} + \mathbf{\dot{x}}_{k-1}\Delta t + \frac{1}{2}\mathbf{\ddot{{x}}}_{k-1}\Delta t^2\,,
 \end{equation}
-where $\mathbf{x_{k}}$ is the position vector defined by the 2D pixel co-ordinate of a mosquito $\begin{bmatrix} x & y \end{bmatrix}^\mathrm{T}$. A constant velocity model with acceleration as noise will be used since mosquitoes have an erratic flight pattern. Therefore, the set of differential equations describing the state space of the Kalman filter is
+where $\mathbf{x}_{k}$ is the position vector defined by the 2D pixel co-ordinate of a mosquito $\begin{bmatrix} x & y \end{bmatrix}^\mathrm{T}$. A constant velocity model with acceleration as noise will be used since mosquitoes have an erratic flight pattern. Therefore, the set of differential equations describing the state space of the Kalman filter is
 \begin{equation}
-    \begin{aligned}
+    \begin{split}
         \mathbf{x}_k
-         & = \mathbf{Ax}_{k-1} + \mathbf{Bu}_k + \mathbf{w}_k \\
+        & = \mathbf{Ax}_{k-1} + \mathbf{Bu}_k + \mathbf{w}_k \\
         \begin{bmatrix}
             x_k       \\
             y_k       \\
             \dot{x}_k \\
             \dot{y}_k
         \end{bmatrix}
-         & =
+        & =
         \begin{bmatrix}
-            x_{k-1}+\dot{x}_{k-1} \Delta t \\
-            y_{k-1}+\dot{y}_{k-1} \Delta t \\
-            \dot{x}_{k-1}                  \\
+            1 & 0 & \Delta t & 0        \\
+            0 & 1 & 0        & \Delta t \\
+            0 & 0 & 1        & 0        \\
+            0 & 0 & 0        & 1
+        \end{bmatrix}
+        \begin{bmatrix}
+            x_{k-1}       \\
+            y_{k-1}       \\
+            \dot{x}_{k-1} \\
             \dot{y}_{k-1}
-        \end{bmatrix}\,.
-    \end{aligned}
+        \end{bmatrix}\,,
+    \end{split}
 \end{equation}
-
-The state is $\mathbf{x} = \begin{bmatrix} x & y & \dot{x} & \dot{y} \end{bmatrix}^\mathrm{T}$ and the state transition matrix is
+where $\mathbf{u}_k$ is the input vector, which is the acceleration of the mosquito according to its kinematic flight model defined in \autoref{eq:mosquito_kinematic_equation}. However, this acceleration is unknown and will be compensated for by the process noise $\mathbf{w}_k$, thus $\mathbf{u}_k = \mathbf{0}$. The process noise $\mathbf{w}_k$ is assumed to be drawn from a zero mean multivariate normal distribution $\mathcal{N}$ with covariance $\mathbf{Q}_k$. Hence, $\mathbf{w}_k \sim$ $\mathcal{N}$ $\left(0, \mathbf{Q}_k\right)$, thus, $\mathbb{E}[w_k] = 0$ and $\mathbb{E}[w_kw_k^\mathrm{T}] = \mathbf{Q}_k$. The process noise covariance matrix $\mathbf{Q}$ is given by
 \begin{equation}
-    \label{eq:kalman_filter_state_transition_matrix}
-    A = \begin{bmatrix}
-        1 & 0 & \Delta t & 0        \\
-        0 & 1 & 0        & \Delta t \\
-        0 & 0 & 1        & 0        \\
-        0 & 0 & 0        & 1
-    \end{bmatrix}\,.
-\end{equation}
-The position of a mosquito is the only component of the state the is measured by the detection system. Thus, the observation matrix $H$ is given by
-\begin{equation}
-    \label{eq:kalman_filter_observation_matrix}
-    H = \begin{bmatrix}
-        1 & 0 & 0 & 0 \\
-        0 & 1 & 0 & 0
-    \end{bmatrix}\,.
-\end{equation}
-
-The error in the constant velocity model of The process noise covariance matrix $Q$ is given by
-\begin{equation}
-    Q = \begin{bmatrix}
+    \label{eq:kalman_filter_process_noise_covariance_matrix}
+    \mathbf{Q} = \begin{bmatrix}
         \sigma_{x}^2               & 0                          & \sigma_{x}\sigma_{\dot{x}} & 0                          \\
         0                          & \sigma_{y}^2               & 0                          & \sigma_{y}\sigma_{\dot{y}} \\
         \sigma_{\dot{x}}\sigma_{x} & 0                          & \sigma_{\dot{x}}^2         & 0                          \\
         0                          & \sigma_{\dot{y}}\sigma_{y} & 0                          & \sigma_{\dot{y}}^2
-    \end{bmatrix}
-    \label{eq:kalman_filter_process_noise_covariance_matrix}
+    \end{bmatrix}\,,
+\end{equation}
+where $\sigma_{x}$ and $\sigma_{\dot{x}}$ are the standard deviations of the position and velocity, respectively. The standard deviation of the position is defined as the standard deviation of the acceleration $\sigma_{\ddot{x}}$ multiplied by $\frac{1}{2}\Delta t^2$ since this is the effect that the acceleration will have on the position as shown in \autoref{eq:mosquito_kinematic_equation}. Similarly, the standard deviation of the velocity is defined as $\Delta t \sigma_{\ddot{x}}$. Therefore, the process noise covariance can be written as
+\begin{equation}
+    \mathbf{Q} =
+    \sigma_{\ddot{x}}^{2}
+    \begin{bmatrix}
+        \frac{\Delta t^4}{4} & 0                    & \frac{\Delta t^3}{2} & 0                    \\
+        0                    & \frac{\Delta t^4}{4} & 0                    & \frac{\Delta t^3}{2} \\
+        \frac{\Delta t^3}{2} & 0                    & \Delta t^2           & 0                    \\
+        0                    & \frac{\Delta t^3}{2} & 0                    & \Delta t^2
+    \end{bmatrix}\,.
 \end{equation}
 
-where $\sigma_{x}$ and $\sigma_{\dot{x}}$ are the standard deviations of the position and velocity, respectively. The standard deviation of the position is defined as the standard deviation of the acceleration $\sigma_a$ multiplied by $\sfrac{1}{2}\Delta t^2$ since this is the effect that the acceleration will have on the position as shown in
-
-The measurement noise covariance matrix $R$ is given by
-
+The position of a mosquito is the only component of the state that is measured by the detection system. Thus, the observation matrix $\mathbf{H}$ is
 \begin{equation}
-    R = \begin{bmatrix}
+    \mathbf{H} = \begin{bmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0
+    \end{bmatrix}\,.
+\end{equation}
+The measurement noise covariance matrix $\mathbf{R}$ is
+\begin{equation}
+    \mathbf{R} = \begin{bmatrix}
         \sigma_{x}^2 & 0            \\
         0            & \sigma_{y}^2
-    \end{bmatrix}
-    \label{eq:kalman_filter_measurement_noise_covariance_matrix}
+    \end{bmatrix}\,,
 \end{equation}
-
-where $\sigma_{x}^2$ and $\sigma_{y}^2$ are the variances of the measurement noise. The initial state covariance matrix $P$ is given by
-
+where $\sigma_{x}^2$ and $\sigma_{y}^2$ are the variances of the position detected. The initial state covariance matrix $\mathbf{P}$ is given by
 \begin{equation}
-    P = \begin{bmatrix}
-        \sigma_{x}^2 & 0            & 0                  & 0                  \\
-        0            & \sigma_{y}^2 & 0                  & 0                  \\
-        0            & 0            & \sigma_{\dot{x}}^2 & 0                  \\
-        0            & 0            & 0                  & \sigma_{\dot{y}}^2
-    \end{bmatrix}
-    \label{eq:kalman_filter_initial_state_covariance_matrix}
+    \mathbf{P} = \begin{bmatrix}
+        \sigma_{x}^2 & 0            & 0               & 0               \\
+        0            & \sigma_{y}^2 & 0               & 0               \\
+        0            & 0            & \dot{x}_{max}^2 & 0               \\
+        0            & 0            & 0               & \dot{y}_{max}^2
+    \end{bmatrix}\,.
 \end{equation}
 
-where $\sigma_{x}^2$, $\sigma_{y}^2$, $\sigma_{\dot{x}}^2$, and $\sigma_{\dot{y}}^2$ are the variances of the initial state. The variances of the process noise and the measurement noise were tuned to obtain the best results.
+The Kalman filter is initialised with the position of the mosquito as the initial state $\mathbf{x}_0$. The position of the mosquito in the next frame $\mathbf{\hat{x}}_{k\mid k-1}$ is predicted using the adapted predict equation of the Kalman filter $\mathbf{\hat{x}}_{k\mid k-1} = \mathbf{A}_k \mathbf{x}_{k-1\mid k-1}$. This prediction will be used in the association step before the update step. The update step of the Kalman filter is performed using the update equation of the Kalman filter $\mathbf{x}_{k\mid k} = \mathbf{x}_{k\mid k-1} + \mathbf{K}_k \left(\mathbf{z}_k - \mathbf{H}_k \mathbf{x}_{k\mid k-1}\right)$, where $\mathbf{K}_k$ is the Kalman gain and $\mathbf{z}_k$ is the measurement vector. The measurement vector $\mathbf{z}_k$ is the position of the mosquito detected in the current frame.
+
 
 \paragraph{Association}\mbox{}\\
+The association of tracks and detections will be done using the Hungarian algorithm, which is an optimised optimal assignment algorithm. The Hungarian algorithm has a time complexity of $O\left(n!\right)$ compared to the time complexity na\"ive approach $O\left(n^3\right)$. The Hungarian algorithm works as follows:
+\begin{description}[style=nextline]
+    \item[Generate a cost matrix.] Represent the problem with a square $n \times n$ matrix $\mathbf{C}$ where the element $\mathbf{C}_{i,j}$ represents the cost of assigning track $i$ to detection $j$. The cost function is the euclidean distance between the predicted location and the detected location of the mosquito.
+    \item[Row and column reduction.] Subtract the minimum value in each row from each element in the row. Perform the same operation for each column. This will produce a matrix with at least one zero in each row and column.
+    \item[Cover zeros and check for optimality.] Cover all the zeros in the matrix using the minimum number of horizontal and vertical lines. If the minimum number of covering lines is $n$, an optimal assignment exists among the zeros, and the algorithm can proceed to the assignment phase. If not, you need to adjust the matrix and repeat from this step.
+    \item[Adjust the matrix.] Find the smallest element that is not covered by any line. Subtract this element from all uncovered elements, and add it to all elements at the intersections of the covering lines. Return to \textit{cover zeros and check for optimality}.
+    \item[Assignment.] Once an optimal assignment is found, read the assignment from the zeros in the matrix. \sout{Each row will have exactly one zero, and each column may have one zero. If a column has no zeros, the track corresponding to that column is unassigned. If a column has more than one zero, the track corresponding to that column is assigned to the detection corresponding to the zero that is covered by a star. If a row has more than one zero, the track corresponding to that row is assigned to the detection corresponding to the zero that is covered by a star.}
+\end{description}
+
+
+
+\subsubsection{Laser turret control system}
+The laser turret control system is a closed-loop \gls{pid} controller. A \gls{pid} controller is represented by the following equation
+\begin{equation}
+    \label{eq:pid_controller}
+    u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau) d\tau + K_d \frac{de(t)}{dt}\,,
+\end{equation}
+where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the proportional gain, $K_i$ is the integral gain, and $K_d$ is the derivative gain. The goal of the laser turret control system is to position the laser beam on the target co-ordinates. The target co-ordinates is defined by the camera mosquito detection system in pixels. The stepper motors are controlled in steps, thus the target pixels and must be mapped to the number of steps required to move the laser beam to the target co-ordinates. The steps are defined in reference to the origin of the laser turret, which is the position when the laser beam is perpendicular to the $xy$-plane of the mosquito enclosure. The block diagram of the laser turret control system can be seen in \autoref{fig:control_system}. The two axes of the laser turret are controlled independently each having their own \gls{pid} controller. The \gls{pid} controller is implemented in software and the control signal is sent to the stepper motor drivers using \gls{gpio}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/control_system.pdf}
+    \caption{Laser turret control system.}
+    \label{fig:control_system}
+\end{figure}
+
 
 
 \subsection{Software implementation and optimisation}
 Only using red channel, \gls{gpu}, low resolution, etc.
+
+The Raspberry Pi camera v2 was chosen. The low resolution was 700 x 300 was chosen to reduce computational complexity.
+
+\subsubsection{Image processing}
+The binarisation and image enhancement processes described in \autoref{subsubsec:mosquito_and_laser_detection} are suitable for parallelisation. Therefore, custom \gls{cuda} kernels were written to perdform these operations on \gls{gpu}.
 
 
 \subsection{Final system integration and testing}

@@ -7,17 +7,6 @@
 \documentclass{epr400}
 
 %% My packages, was not included in the template
-\usepackage{algpseudocode}
-\usepackage{subcaption}
-\usepackage{siunitx} % For SI units
-\usepackage{xfrac} % For slanted fractions \sfrac{}{}
-\usepackage{fp} % For floating point calculations
-\usepackage{pgfmath} % Include the pgfmath package
-\usepackage{ulem}
-\usepackage{tabularx}
-\usepackage{enumitem}
-\setlist[itemize]{topsep=3pt, partopsep=0pt, itemsep=0pt, parsep=0pt}
-\usepackage{soul} % For highlighting text with \hl{}
 \usepackage[hidelinks]{hyperref}
 % Define autoref name for algorithms
 \providecommand*{\algorithmautorefname}{Algorithm}
@@ -41,6 +30,22 @@
   }
 }
 \setglossarystyle{epr_template_style}
+
+\usepackage{algpseudocode}
+\usepackage{subcaption}
+\captionsetup[subfigure]{format=default, singlelinecheck=false}
+% Define a 'nonhang' format and set it for subcaptions
+% \DeclareCaptionFormat{nonhang}{\hspace*{1pt}#1#2\\ #3}
+% \captionsetup[subfigure]{format=nonhang, indention=0cm, singlelinecheck=false}
+\usepackage{siunitx} % For SI units
+\usepackage{xfrac} % For slanted fractions \sfrac{}{}
+\usepackage{fp} % For floating point calculations
+\usepackage{pgfmath} % Include the pgfmath package
+\usepackage{ulem}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\setlist[itemize]{topsep=3pt, partopsep=0pt, itemsep=0pt, parsep=0pt}
+\usepackage{soul} % For highlighting text with \hl{}
 
 
 % Level 4 headings with \paragraph{
@@ -97,8 +102,7 @@ This section contains the problem identification in the form of the complete app
 \newpage
 
 %% Import the approved project proposal
-% \includepdf[pages=-, angle=90]{ApprovedProposal.pdf}
-\includepdf[pages=-, angle=90]{HartmanAM_20475323_R1_FEEDBACK_Comments_Romoved.pdf}
+% \includepdf[pages=-, angle=90]{HartmanAM_20475323_R1_FEEDBACK_Comments_Romoved.pdf}
 
 \addtocontents{toc}{\protect\contentsline{subsection}{1. Project description}{}\%}
 \addtocontents{toc}{\protect\contentsline{subsection}{2. Technical challenges in this project}{}\%}
