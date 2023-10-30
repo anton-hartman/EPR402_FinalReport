@@ -278,12 +278,8 @@ Detection and tracking done in python with videos.
 
 
 
-
 \subsection{Hardware design}
-\textit{Turret inspired by 2d laser scanners. Motor step resolution, speed, and torque calculations. Motor driver selection based on microstepping capabilities. Turret CAD design. Math translation between angle and distance of laser.}
-
 The hardware overview is presented in \autoref{fig:hardware_overview}. The hardware consists primarily of a laser turret, a camera, a mosquito enclosure, and an embedded processing platform. The laser turret is used to move the laser beam across the mosquito enclosure. The camera is used to detect the laser beam and the mosquitoes. A bracket is used to position the laser turret and the camera relative to the mosquito enclosure. The embedded processing platform is used to control the laser turret and perform the image processing required for the laser detection and mosquito detection.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\textwidth]{figures/hardware_design/hardware_overview.pdf}
@@ -295,7 +291,6 @@ The hardware overview is presented in \autoref{fig:hardware_overview}. The hardw
 
 \subsubsection{Embedded platform selection}
 To select an embedded platform for the project the following requirements were considered:
-
 \begin{description}[style=nextline]
     \item[Processing power] The embedded platform must be able to perform the image processing required for the laser detection and mosquito detection in real-time. Image processing is computationally intensive, but can largely benefit from parallelisation. Therefore, an embedded platform with a \gls{gpu} will be preferred.
     \item[Memory] The embedded platform must have sufficient memory to store the multiple images along with the required algorithms. A 1080p image with 3 8-bit colour channels requires 6 MB of memory.
@@ -316,7 +311,6 @@ The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The 
 
 \subsubsection{Mosquito enclosure}
 The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosquito_enclosure_dimensions}. The width of the enclosure must be a minimum length of 1 metre. The front facing surface will be transparent and the rest of the surfaces will be white. The enclosure will be fitted with internal lighting to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/rectangular_prism.png}
@@ -325,9 +319,9 @@ The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosq
 \end{figure}
 
 
+
 \subsubsection{System positioning}
 The laser turret and the camera will be placed outside the mosquito enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, will be built to hold the laser turret and the camera in place relative to the mosquito enclosure.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/positioning_bracket.png}
@@ -337,9 +331,8 @@ The laser turret and the camera will be placed outside the mosquito enclosure in
 
 
 
-\subsubsection{Laser turret}
+\subsubsection{Laser turret}\label{subsubsec:laser_turret_design}
 The laser turret design was inspired by commercial two-axis laser scanners. The position of the laser beam is controlled by adjusting the angles of two mirrors. This is illustrated in \autoref{fig:two-axis-scanner-schematic}. The mirrors are connected directly to the output shaft of the motors. The laser turret will be positioned orthogonally to the $xy$-plane of the mosquito enclosure. The point where the laser beam shines orthogonal to the $xy$-plane of the mosquito enclosure is considered the origin of the laser. This will occur when the two mirrors are at 45$\degree$ relative to the laser beam.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/two_axis_scanner.png}
@@ -353,7 +346,6 @@ When a single axis of the laser turret is considered it can be seen that a right
     \label{eq:mirror_angle}
 \end{equation}
 where $z$ is the distance between the turret and the back wall of the mosquito enclosure.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/mirror_angle.png}
@@ -361,24 +353,16 @@ where $z$ is the distance between the turret and the back wall of the mosquito e
     \label{fig:mirror_angle}
 \end{figure}
 
+\newcommand{\requiredLatStepSizeMM}{2}
+The lateral step size of the laser must be a maximum of $\requiredLatStepSizeMM$\,mm. This will ensure that the laser will be able to illuminate every position in the mosquito enclosure since the laser itself will be a few millimetres wide.
 
-
-
-
-\paragraph{Required lateral step size}\mbox{}\\
-\newcommand{\requiredLatStepSizeMM}{2} % mm
-The lateral step size of the laser must be on the order of $\requiredLatStepSizeMM$ mm (size of mosquito plus size of laser).
-
-
-\paragraph{Required lateral speed}\mbox{}\\
-\newcommand{\requiredLatSpeedMPS}{1} % m/s
+\newcommand{\requiredLatSpeedMPS}{1}
 The required lateral speed is determined in accordance with the field specifications. The longest length of the mosquito enclosure $d_{max}$ will be $\SI{1}{\meter}$. To ensure that the laser can illuminate any set point inside the mosquito enclosure within $\SI{2}{\second}$ of receiving a step input, it was assumed that the laser must be able to move with a velocity $v_{laser}$ of least $\SI{\requiredLatSpeedMPS}{\meter\per\second}$ opposed to the $\SI{0.5}{\meter\per\second}$ required to move the $\SI{1}{\meter}$ length of the mosquito enclosure within $\SI{2}{\second}$. This was done to accommodate for the settling time of the laser turret control system.
-%This is also faster than the top speed of a mosquito which is 0.67~m/s.
+
 
 
 
 \subsection{Hardware implementation}
-\gls{gpio} interfacing with stepper motor driver.
 
 
 
@@ -398,7 +382,6 @@ The specific geometry of the laser turret was designed with the goal to practica
 \label{par:angular_step_size}
 \paragraph{Angular step size}\mbox{}\\
 The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$. This was conservatively determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
@@ -442,38 +425,12 @@ The required torque $\tau$ was calculated using
 \end{equation}
 where $I$ is the moment of inertia of the load, which is the mirror, and $\alpha$ is the required angular acceleration.
 
-% \begin{figure}[h]
-%     \centering
-%     \includegraphics[scale=1]{figures/hardware_design/cylinder_central_axis.png}
-%     \caption{Central axis of a cylinder.}
-%     \label{fig:cylinder_central_axis}
-% \end{figure}
-
-% The moment of inertia for the mirror was calculated by assuming the mirror is solid cylinder with diameter equal to the width of the mirror. This will produce an inflated moment of inertia, however, this is not a concern since having extra torque is not a problem. The moment of inertia $I$ of a cylinder with rotation about its central axis as seen in \autoref{fig:cylinder_central_axis} is given by
-% \begin{equation}
-%     I = \frac{1}{2}Mr^2\,,
-% \end{equation}
-% where $M$ is the mass of the cylinder and $r$ is the radius of the cylinder. The mass of the cylinder $M$ will be calculated using the density of glass $\rho = \SI{2500}{\kg\per\meter\cubed}$ and the volume of the cylinder $V$ given by
-% \begin{equation}
-%     V = \pi r^2 h\,.
-% \end{equation}
-% The height $h$ and radius $r$ of the cylinder is given by the chosen mirror dimensions as $h = 30\,\text{mm}$ and $r = 7.5\,\text{mm}$. The mass of the mirror $M$ is
-% \begin{equation}
-%     M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times \pi \left(7.5\,\text{mm}\right)^2 (30\,\text{mm}) = 13.25\,\text{g}\,.
-% \end{equation}
-% Thus, the moment of inertia of the mirror is
-% \begin{equation}
-%     I = \frac{1}{2}Mr^2 = \frac{1}{2}(13.25\,\text{g})(7.5\,\text{mm})^2 = \SI{3.73e-7}{\kg\per\meter\squared}\,.
-% \end{equation}
-
-
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/rect_inertia.png}
     \caption{Axes and dimensions of a rectangular prism.}
     \label{fig:rect_inertia}
 \end{figure}
-
 The moment of inertia of the mirror was calculated using the equation for the moment of inertia of a rectangular prism with rotation about its $x$-axis as seen in \autoref{fig:rect_inertia} given by
 \begin{equation}
     I = \frac{1}{12}M\left(b^2 + c^2\right)\,,
@@ -595,44 +552,81 @@ The effective torque of the stepper motor at maximum speed is greater than the r
 \end{figure}
 
 
+\paragraph{Laser selection and activation circuit}\hfill\\
+A low-powered 5~mW red laser with adjustable focus was chosen for the laser turret. The laser has an operating voltage range of $2.8 - 5.2$\,V. A low-powered laser was chosen for safety. The adjustable focus enabled the laser beam to be focused to a small spot size on the back wall of the mosquito enclosure. The laser must be red since the image processing will be done using on the red channel of the \gls{rgb} video frame.
+
+The 3.3~V \gls{gpio} of the Nvidia Jetson Nano cannot supply enough current to power the laser. A transistor circuit was designed to enable the laser to be turned on and off from the Nvidia Jetson Nano \gls{gpio}.
+
+
+\paragraph{Laser turret \gls{cad}}
+The laser turret was designed in \gls{cad} using Autodesk Fusion 360. The laser turret was designed to be mounted on the bracket shown in \autoref{fig:system_positioning_bracket}. The main component and subcomponents of the laser turret can be seen in \autoref{fig:turret_cad} and \autoref{fig:turret_subcomponents} respectively.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/hardware_design/turret.png}
+    \caption{Laser turret main component.}
+    \label{fig:turret_cad}
+\end{figure}
+\begin{figure}[!htb]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/laser_mount.png}
+        \caption{Laser mount.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/motor_mount.png}
+        \caption{Motor mount.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/turret_clamp.png}
+        \caption{Laser turret clamp.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/mirror_holder.png}
+        \caption{Mirror holder.}
+    \end{subfigure}
+    \caption{Laser turret subcomponents.}
+    \label{fig:turret_subcomponents}
+\end{figure}
 
 
 
+\FloatBarrier
 \subsection{Software design}
 \textit{Mapping between pixels and real distance. Mosquito detection and tracking. Laser detection and tracking. \gls{pid} controller. Feedback for turret. Distinguishing between laser reflections.}
 
 
 
 \subsubsection{Mosquito and laser detection} \label{subsubsec:mosquito_and_laser_detection}
-It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame would be cropped such that only the white back wall of the enclosure is visible.
+It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser and its reflections would be the only bright blobs in the enclosure. The video frame will be cropped such that only the white back surface of the enclosure is visible. To reduce the computational complexity of the image processing only the red channel of the \gls{rgb} frame will be used, hence, the necessity of the red laser.
 
-The detection system was designed to work with a red laser because the computational complexity could then be decreased by only considering the red channel of the \gls{rgb} frame.
-
-The mosquito detection was designed to detect dark blobs in the enclosure and would not be able to distinguish between mosquitoes and other dark blobs. The laser detection was designed to detect bright blobs in the enclosure and would not be able to distinguish between the laser and its reflections. The mosquito and laser detection processes are similar in nature. The basic detection process flow is shown in \autoref{fig:detection_process_flow}.
+The mosquito detection was designed to detect dark blobs in the enclosure and would not be able to distinguish between mosquitoes and other dark blobs. The laser detection was designed to detect bright blobs in the enclosure and would not be able to distinguish between the laser's reflections and other bright blobs. The mosquito and laser detection processes are similar in nature. The basic detection process flow is shown in \autoref{fig:detection_process_flow}.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/detection/detection_process_flow.pdf}
+    \includegraphics[width=\textwidth]{figures/detection/detection_process_flow.pdf}
     \caption{Detection process flow.}
     \label{fig:detection_process_flow}
 \end{figure}
-The red channel of the \gls{rgb} frame will be extracted and a copy would be made such the image processing operations can be performed independently to detect both the mosquitoes and the laser.
+The red channel of the \gls{rgb} frame will be extracted, which will be referred to as the frame for the rest of this discussion. The difference between the mosquito and laser detection occurs in the binarisation step. A copy of the frame is made before binarising so that both the mosquito and laser detection can be performed since the frame will be overwritten in the image processing steps in pursuit of efficiency.
 
 
 \paragraph{Binarisation}\mbox{}\\
-The only difference between the mosquito and laser detection is the binarisation step. The red channel will be binarised using a threshold value. The binarisation will be using a greater than threshold value for the laser detection and a less than threshold value for the mosquito detection. The ideal result of the binarisation is a binary image with the laser and its reflections as foreground pixels and the background as background pixels, likewise for the mosquitoes. This will not be the case since the foreground pixels can not be perfectly isolated using a threshold value and frame will contain noise.
+The frame will be binarised using a threshold value. The exposure of the camera will be fixed and the lighting in the mosquito enclosure will be controlled thus the threshold value will be fixed. To detect mosquitoes the frame will be binarised with a less than threshold since the mosquitoes will be darker than the white background. To detect the laser's reflections the frame will be binarised with a greater than threshold since the laser and its reflections will be brighter than the white background. The ideal result of the binarisation is an image where the mosquitoes and the laser's reflections are the only foreground pixels in their respective copies of the frame. This will not be the case since the mosquitoes and the laser's reflections can not be perfectly isolated using a threshold value in frame that will contain noise from the camera sensor.
 
 
 \paragraph{Image enhancement}\mbox{}\\
-The respective binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations. Morphological operations work by passing a structuring element over the pixels in an image and performing a logical operation on the pixels in the image that are covered by the structuring element.
+The binarised frames are subject to noise, holes, and erroneously joint or disjointed sections. This can be resolved using morphological operations.
+The goal of the morphological operations is to ensure that all the foreground pixels that correspond to a detection are connected, that there are no foreground pixels that do not correspond to a detection, and that there are no erroneously joint or disjoint foreground pixels. There must be a one to one correspondence between the groups of connected foreground pixels and the objects that must be detected. The connectivity of pixels will be explained in \autoref{par:ccl}. Morphological operations work by passing a structuring element over the pixels in an image and performing a logical operation on the pixels in the image that are covered by the structuring element.
 
 The noise and erroneously joint sections are removed using the morphological opening operation. Opening has been formally defined in \autoref{subsubsec:morphological_operations}. The opening of $A$ by $B$ is the union of all translations of $B$ that are completely contained in $A$ as illustrated in \autoref{fig:opening}. The holes and erroneously disjointed sections are removed using the morphological closing operation. Closing has been formally defined \autoref{subsubsec:morphological_operations}. The closing of $A$ by $B$ is the complement of the union of all translations of $B$ that do not overlap $A$ as illustrated in \autoref{fig:closing}.
 
-The goal of the morphological operations is to ensure that all the foreground pixels are connected and that there are no erroneously connected foreground pixels such that the connected sections can be identified. The connectivity of pixels will be explained in \autoref{par:ccl}. The structuring element B will be tuned to obtain the best results.
+The structuring element must be identical independent of orientation in a 2D image since the orientation of the mosquitoes will be unknown. The structuring element will therefore be a disc. The size of the disc will be adjusted independently for the opening and closing operations for both the mosquito and laser detection.
 
 
 \paragraph{Connected components labelling}\label{par:ccl}\mbox{}\\
-Once the processed binary image has been obtained the co-ordinates of the blobs need to be identified. This is done using \gls{ccl}. \Gls{ccl} is the process of assigning a label to each foreground pixel in a binary image such that connected pixels have the same label. The connectivity of pixels are defined using either four or eight connectivity. Four connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. Eight connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
-
+From the enhanced binary frames the co-ordinates of the connected foreground pixels must be obtained. This is done using \gls{ccl}. \Gls{ccl} is the process of assigning a label to each foreground pixel in a binary image such that connected pixels have the same label. The connectivity of pixels are defined using either four or eight connectivity. Four connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, and bottom of the pixel. Eight connectivity defines the neighbourhood of a pixel as the pixels to the left, right, top, bottom, top left, top right, bottom left, and bottom right of the pixel. The \gls{ccl} connectivity is shown in \autoref{fig:ccl_connectivity}.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -652,10 +646,9 @@ Once the processed binary image has been obtained the co-ordinates of the blobs 
     \label{fig:ccl_connectivity}
 \end{figure}
 
-Various algorithms exist to perform \gls{ccl}. Two of the most commonly used algorithms are the two-pass algorithm and the single-pass algorithm. The two-pass algorithm is generally faster for images with large connected components and the single-pass algorithm is generally faster for images with small connected components. The nature of the mosquito and laser detection is such that the connected components will be small, thus the single-pass algorithm was chosen. The single-pass algorithm is illustrated in \autoref{alg:single_pass_ccl}.
-
+Various algorithms exist to perform \gls{ccl}. Two of the most commonly used algorithms are the two-pass algorithm and the breadth-first single-pass algorithm. The two-pass algorithm is generally faster for images with large connected components and the breadth-first single-pass algorithm is generally faster for images with small connected components. The nature of the mosquito and laser detection is such that the connected components will be small, thus the breadth-first single-pass algorithm was chosen. The breadth-first single-pass algorithm is presented in \autoref{alg:single_pass_ccl}.
 \begin{algorithm}[h]
-    \caption{Single-Pass Connected Component Labelling}
+    \caption{Breadth-First Single-Pass Connected Component Labelling}
     \label{alg:single_pass_ccl}
     \begin{algorithmic}[1]
         \Procedure{SinglePassCCL}{$image$}
@@ -691,15 +684,15 @@ Various algorithms exist to perform \gls{ccl}. Two of the most commonly used alg
 
 
 
-\subsubsection{Distinguishing between the laser reflections}
+\subsubsection{Distinguishing between the laser's reflections}
 The laser must shine through the front glass of the mosquito enclosure. This results in various reflections of the laser beam. There are three predominate reflections that can not be distinguished using a brightness threshold. These reflections are:
 \begin{itemize}
     \item The reflection of the laser beam off the front glass at the origin of the laser turret, resulting from scattered light off the turret mirrors.
     \item The reflection of the laser beam incident on the front glass.
-    \item The reflection of interest, which is the reflection of the laser beam incident on a mosquito or the back wall of the enclosure.
+    \item The reflection of interest, which is the reflection of the laser beam incident on a mosquito or the back surface of the enclosure.
 \end{itemize}
 
-The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors adjusted. The remaining two reflections are distinguished using the geometric properties of the hardware setup. The $yz$-plane of the hardware setup is shown in \autoref{fig:distinguish_lasers}. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin then the reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
+The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors changing. The remaining two reflections are distinguished using the geometric properties of the system positioning. The $yz$-plane of the system is shown in \autoref{fig:distinguish_lasers}. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin then the reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
 \begin{figure}[h]
     \centering
     \begin{subfigure}[t]{0.45\textwidth}
@@ -711,7 +704,7 @@ The reflection off the front glass at the origin of the laser turret remains sta
         \includegraphics[width=\linewidth]{figures/distinguish_lasers_zoomed_inflection.png}
         \caption{Laser reflections zoomed in on the inflection point.}
     \end{subfigure}
-    \caption{Distinguishing between the laser reflections.}
+    \caption{Distinguishing between the laser's reflections.}
     \label{fig:distinguish_lasers}
 \end{figure}
 
@@ -820,7 +813,7 @@ The laser turret control system is a closed-loop \gls{pid} controller. A \gls{pi
     \label{eq:pid_controller}
     u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau) d\tau + K_d \frac{de(t)}{dt}\,,
 \end{equation}
-where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the proportional gain, $K_i$ is the integral gain, and $K_d$ is the derivative gain. The goal of the laser turret control system is to position the laser beam on the target co-ordinates. The target co-ordinates is defined by the camera mosquito detection system in pixels. The stepper motors are controlled in steps, thus the target pixels and must be mapped to the number of steps required to move the laser beam to the target co-ordinates. The steps are defined in reference to the origin of the laser turret, which is the position when the laser beam is perpendicular to the $xy$-plane of the mosquito enclosure. The block diagram of the laser turret control system can be seen in \autoref{fig:control_system}. The two axes of the laser turret are controlled independently each having their own \gls{pid} controller. The \gls{pid} controller is implemented in software and the control signal is sent to the stepper motor drivers using \gls{gpio}.
+where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the proportional gain, $K_i$ is the integral gain, and $K_d$ is the derivative gain. The goal of the laser turret control system is to position the laser beam at the target co-ordinates. The target co-ordinates is defined by the mosquito detection and tracking system in pixels. The stepper motors are controlled in steps, thus the target pixels and must be mapped to the number of steps required to move the laser beam to the target co-ordinates. The steps are defined in reference to the origin of the laser defined in \autoref{subsubsec:laser_turret_design}, which is the position when the laser beam is perpendicular to the $xy$-plane of the mosquito enclosure. The block diagram of the laser turret control system can be seen in \autoref{fig:control_system}. The two axes of the laser turret are controlled independently each having their own \gls{pid} controller. The \gls{pid} controller is implemented in software and the control signal is sent to the stepper motor drivers using \gls{gpio}.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/control_system.pdf}
@@ -832,14 +825,85 @@ where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the pro
 
 \subsection{Software implementation and optimisation}
 Only using red channel, \gls{gpu}, low resolution, etc.
+\gls{gpio} interfacing with stepper motor driver.
 
 The Raspberry Pi camera v2 was chosen. The low resolution was 700 x 300 was chosen to reduce computational complexity.
 
 \subsubsection{Image processing}
 The binarisation and image enhancement processes described in \autoref{subsubsec:mosquito_and_laser_detection} are suitable for parallelisation. Therefore, custom \gls{cuda} kernels were written to perdform these operations on \gls{gpu}.
 
+\begin{minipage}{\linewidth}
+    \begin{lstlisting}[language=C++, caption={Erosion GPU kernel.}]
+__global__ void erosion(uint8_t* input,
+                        uint8_t* output,
+                        uint8_t* struct_elem,
+                        int struct_elem_radius) {
+  int x = blockIdx.x * blockDim.x + threadIdx.x;
+  int y = blockIdx.y * blockDim.y + threadIdx.y;
+  
+  if (x < d_COLS && y < d_ROWS) {
+    int min_val = 255;
+    for (int i = -struct_elem_radius; i <= struct_elem_radius; i++) {
+      for (int j = -struct_elem_radius; j <= struct_elem_radius; j++) {
+        if (y + i >= 0 && y + i < d_ROWS && x + j >= 0 && x + j < d_COLS) 
+        {
+          if (struct_elem[(i + struct_elem_radius) *
+                          (2 * struct_elem_radius + 1) +
+                          j + struct_elem_radius] == 1) 
+          {
+            int idx = (y + i) * d_COLS + (x + j);
+            min_val = min(min_val, (int)input[idx]);
+          }
+        }
+      }
+    }
+    output[y * d_COLS + x] = min_val;
+  }
+}
+\end{lstlisting}
+\end{minipage}
 
-\subsection{Final system integration and testing}
+
+
+\subsubsection{Laser turret control}
+The laser turret control consists of various independent subcomponents that required meticulous attention to detail to successfully integrate. The integration will be discussed in \autoref{subsec:integration}. The focus in this section will be on the subcomponents.
+
+
+\paragraph{Interfacing with stepper motor drivers}\mbox{}\\
+The stepper motors drivers were connected to the Nvidia Jetson Nano \gls{gpio} according to the diagram in \autoref{fig:stepper_driver_pins}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/stepper_driver_pins.pdf}
+    \caption{Stepper motor driver connections.}
+    \label{fig:stepper_driver_pins}
+\end{figure}
+The motors are enabled by setting the \texttt{ENABLE PIN} to a logical high. The direction of rotation is determined by the logic level of the \texttt{DIRECTION PIN}. The stepper motors are driven by pulsing the \texttt{STEP PIN} at the desired frequency for the desired number of steps.
+\begin{algorithm}[h]
+    \caption{Stepper Motor Control}
+    \label{alg:stepper_control}
+    \begin{algorithmic}[1]
+        \State $ENABLE\;PIN \gets \text{logical high}$
+        \State $DIRECTION\;PIN \gets direction$
+        \For{$step \gets 0$ to $steps-1$}
+        \State $STEP\;PIN \gets \text{logical high}$
+        \State $\text{delay}(period)$
+        \State $STEP\;PIN \gets \text{logical low}$
+        \State $\text{delay}(period)$
+        \EndFor
+    \end{algorithmic}
+\end{algorithm}
+
+
+\paragraph{Converting pixels to steps}\mbox{}\\
+The laser turret control system must be able to position the laser beam at any pixel in the enclosure. The laser turret control system must therefore be able to convert pixels to steps. The conversion from pixels to steps is done using the following equation
+\begin{equation}
+    \label{eq:pixels_to_steps}
+    \text{steps} = \frac{\text{pixels}}{\text{pixels per step}}\,,
+\end{equation}
+
+
+
+\subsection{Final system integration and testing}\label{subsec:integration}
 Real-time multi threading.
 
 \newpage
