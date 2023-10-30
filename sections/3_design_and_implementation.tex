@@ -387,14 +387,12 @@ The required lateral speed is determined in accordance with the field specificat
 \newcommand{\enclosureHeightCM}{38} % cm
 \newcommand{\enclosureDepthCM}{32} % cm
 
-The mosquitoes were placed inside an enclosure with a white lining and a glass front panel for the laser beam to shine through. The enclosure is a rectangular prism with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm as seen in \autoref{fig:mosquito_enclosure_dimensions}. Internal lighting was added to the enclosure to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
+The mosquito enclosure was constructed from a second hand glass fish tank with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm. All the surfaces other than front facing surface was retrofitted with a white lining. Internal \glspl{led} were added to the enclosure, shining from the top and bottom surfaces to minimise shadows on the back surface the enclosure, to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
 
 
 
 \subsubsection{Laser turret}
-The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the back wall of the mosquito enclosure, while maintaining sufficient speed.
-
-The dimensions of the mirrors were chosen for practicality as $30 \times 15$~mm.
+The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the back wall of the mosquito enclosure, while maintaining sufficient speed. The dimensions of the mirrors were chosen for practicality as $30 \times 15 \times 3$~mm.
 
 
 \label{par:angular_step_size}
@@ -416,7 +414,7 @@ The minimum distance $z_{min}$ between the laser turret and the mosquito enclosu
 where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta = 40\degree$ is the maximum angle through which the first axis of the laser turret can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into \autoref{eq:mirror_angle} to produce
 \pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
 \begin{equation}
-    \theta_{step}^{max} = \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \stepRes\degree\,.
+    \theta_{step}^{max} = \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \FPeval{\roundStepRes}{round(\stepRes, 3)}\roundStepRes\degree\,.
     \label{eq:max_step_resolution}
 \end{equation}
 
@@ -430,14 +428,13 @@ The maximum angular speed required to move the laser beam at the lateral speed $
 \begin{equation}
     \omega_{max} = v_{laser} \times \theta_{max} = \SI{65.6}{\degree\per\second} = \SI{1.14}{\radian\per\second}\,.
 \end{equation}
+The results in a required motor \gls{rpm} of
+\begin{equation}
+    \omega_{max} = \frac{1}{2\pi} \times \SI{1.14}{\radian\per\second} \times \frac{60}{1} = 10.9 \text{ RPM}\,.
+\end{equation}
 
 
-
-\subsubsection{Motor requirements}
-The required torque and \gls{rpm} were calculated to enable appropriate motor selection.
-
-
-\paragraph{Torque}\mbox{}\\
+\paragraph{Torque}\hfill\\
 The required torque $\tau$ was calculated using
 \begin{equation}
     \tau = I\alpha\,,
@@ -445,31 +442,56 @@ The required torque $\tau$ was calculated using
 \end{equation}
 where $I$ is the moment of inertia of the load, which is the mirror, and $\alpha$ is the required angular acceleration.
 
+% \begin{figure}[h]
+%     \centering
+%     \includegraphics[scale=1]{figures/hardware_design/cylinder_central_axis.png}
+%     \caption{Central axis of a cylinder.}
+%     \label{fig:cylinder_central_axis}
+% \end{figure}
+
+% The moment of inertia for the mirror was calculated by assuming the mirror is solid cylinder with diameter equal to the width of the mirror. This will produce an inflated moment of inertia, however, this is not a concern since having extra torque is not a problem. The moment of inertia $I$ of a cylinder with rotation about its central axis as seen in \autoref{fig:cylinder_central_axis} is given by
+% \begin{equation}
+%     I = \frac{1}{2}Mr^2\,,
+% \end{equation}
+% where $M$ is the mass of the cylinder and $r$ is the radius of the cylinder. The mass of the cylinder $M$ will be calculated using the density of glass $\rho = \SI{2500}{\kg\per\meter\cubed}$ and the volume of the cylinder $V$ given by
+% \begin{equation}
+%     V = \pi r^2 h\,.
+% \end{equation}
+% The height $h$ and radius $r$ of the cylinder is given by the chosen mirror dimensions as $h = 30\,\text{mm}$ and $r = 7.5\,\text{mm}$. The mass of the mirror $M$ is
+% \begin{equation}
+%     M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times \pi \left(7.5\,\text{mm}\right)^2 (30\,\text{mm}) = 13.25\,\text{g}\,.
+% \end{equation}
+% Thus, the moment of inertia of the mirror is
+% \begin{equation}
+%     I = \frac{1}{2}Mr^2 = \frac{1}{2}(13.25\,\text{g})(7.5\,\text{mm})^2 = \SI{3.73e-7}{\kg\per\meter\squared}\,.
+% \end{equation}
+
+
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=1]{figures/hardware_design/cylinder_central_axis.png}
-    \caption{Central axis of a cylinder.}
-    \label{fig:cylinder_central_axis}
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/rect_inertia.png}
+    \caption{Axes and dimensions of a rectangular prism.}
+    \label{fig:rect_inertia}
 \end{figure}
 
-The moment of inertia for the mirror was calculated by assuming the mirror is solid cylinder with diameter equal to the width of the mirror. This will produce an inflated moment of inertia, however, this is not a concern since having extra torque is not a problem. The moment of inertia $I$ of a cylinder with rotation about its central axis as seen in \autoref{fig:cylinder_central_axis} is given by
+The moment of inertia of the mirror was calculated using the equation for the moment of inertia of a rectangular prism with rotation about its $x$-axis as seen in \autoref{fig:rect_inertia} given by
 \begin{equation}
-    I = \frac{1}{2}Mr^2\,,
+    I = \frac{1}{12}M\left(b^2 + c^2\right)\,,
 \end{equation}
-where $M$ is the mass of the cylinder and $r$ is the radius of the cylinder. The mass of the cylinder $M$ will be calculated using the density of glass $\rho = \SI{2500}{\kg\per\meter\cubed}$ and the volume of the cylinder $V$ given by
+where $M$ is the mass of the rectangular prism and $b$ and $c$ are the dimensions of the rectangular prism. The mass of the rectangular prism $M$ will be calculated using the density of glass $\rho = \SI{2500}{\kg\per\meter\cubed}$ and the volume of the rectangular prism $V$ given by
 \begin{equation}
-    V = \pi r^2 h\,.
+    V = abc\,,
 \end{equation}
-The height $h$ and radius $r$ of the cylinder is given by the chosen mirror dimensions as $h = 30 \text{ mm}$ and $r = 7.5 \text{ mm}$. The mass of the mirror $M$ is
+where $a$, $b$, and $c$ are the dimensions of the rectangular prism. The dimensions of the rectangular prism is given by the chosen mirror dimensions as $a = 30\,\text{mm}$, $b = 15\,\text{mm}$, and $c = 3\,\text{mm}$. The mass of the mirror $M$ is
 \begin{equation}
-    M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times \pi \left(7.5 \text{ mm}\right)^2 (30 \text{ mm}) = 13.25 \text{ g}\,.
+    M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times (30\,\text{mm})(15\,\text{mm})(3\,\text{mm}) = 3.38\,\text{g}\,.
 \end{equation}
 Thus, the moment of inertia of the mirror is
 \begin{equation}
-    I = \frac{1}{2}Mr^2 = \frac{1}{2}(13.25 \text{ g})(7.5 \text{ mm})^2 = \SI{3.73e-7}{\kg\per\meter\squared}\,.
+    I = \frac{1}{12}M\left(b^2 + c^2\right) = \frac{1}{12}(3.38\,\text{g})\left((15\,\text{mm})^2 + (3\,\text{mm})^2\right) = \SI{6.59e-8}{\kg\per\meter\squared}\,.
 \end{equation}
 
-The angular acceleration of the motor $\alpha$ is calculated with
+The required angular acceleration of the motor $\alpha$ is calculated with
 \begin{equation}
     \alpha = \frac{\Delta\omega}{\Delta t}\,,
 \end{equation}
@@ -478,10 +500,100 @@ where $\Delta\omega = \omega_{max} - 0$ is the change in angular velocity and $\
     \alpha = \frac{\Delta\omega}{\Delta t} = \frac{\SI{1.14}{\radian\per\second}}{\SI{0.01}{\second}} = \SI{114}{\radian\per\second\squared}\,.
 \end{equation}
 
-Finally, the required torque $\tau$ is
+Given the calculated moment of inertia and angular acceleration the required torque $\tau$ is
 \begin{equation}
-    \tau = I\alpha = \SI{3.73e-7}{\kg\per\meter\squared} \times \SI{114}{\radian\per\second\squared} = \SI{4.35e-5}{\newton\meter}\,.
+    \tau = I\alpha = \SI{6.59e-8}{\kg\per\meter\squared} \times \SI{114}{\radian\per\second\squared} = \SI{7.51e-6}{\newton\meter}\,.
 \end{equation}
+
+
+\paragraph{Motor and driver selection}\hfill\\
+Typical stepper motors have a basic step angle of $1.8\degree$. This does not meat the required step resolution $\theta_{step}^{max} = 0.253\degree$, however the step angle can be reduced by using microstepping. Microstepping works by interpolating the \gls{pwm} signal to the stepper motor driver to produce intermediate step positions between the basic step positions. Stepper motor drivers that support up to 16 microsteps are readily available. Drivers that support up to 256 microsteps are also available. The step angle $\theta_{step}$ of a stepper motor using 8 microsteps is
+\begin{equation}
+    \theta_{step} = \frac{1.8\degree}{16} = 0.1125\degree\,,
+\end{equation}
+which is sufficient to meet the maximum required step resolution $\theta_{step}^{max} = 0.253\degree$. Therefore, a typical stepper motor with a basic step angle of $1.8\degree$ operated using at least 8 microsteps will be sufficient.
+
+A drawback of using microstepping is that the effective torque of the stepper motor is reduced with each increase in microstepping. The torque reduction due to microstepping can be calculated with
+\begin{equation}
+    \tau_{eff} = \tau_{rated} \sin \left(\frac{\pi S}{2}\right)\,,
+\end{equation}
+where
+\begin{itemize}
+    \item $\tau_{eff}$ is the effective torque of the stepper motor for a specific amount of microstepping.
+    \item $\tau_{rated}$ is the rated torque of the stepper motor.
+    \item $S$ is the reciprocal of the number of microsteps.
+\end{itemize}
+
+The effective torque of a stepper motor for the full range of microsteps available is tabulated in \autoref{tab:effective_torque}. It can be seen that microstepping has a drastic impact of the effective torque of the stepper motor. Thus, the required torque will need to be calculated for the chosen microstepping operation.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Microsteps & Effective torque \\
+        \hline
+        1          & 100\%            \\
+        2          & 70.71\%          \\
+        4          & 38.27\%          \\
+        8          & 19.51\%          \\
+        16         & 9.8\%            \\
+        32         & 4.91\%           \\
+        64         & 2.45\%           \\
+        128        & 1.23\%           \\
+        256        & 0.61\%           \\
+        \hline
+    \end{tabular}
+    \caption{Effective torque of stepper motor for full range of microsteps.}
+    \label{tab:effective_torque}
+\end{table}
+
+The DRV8825 stepper motor driver was chosen since it is readily available and supports up to 32 microsteps. The DRV8825 stepper motor driver has a maximum current rating of 2.5~A and a maximum voltage rating of 45~V. The maximum microstepping mode will be utilised for increased resolution in the control of the laser. The required torque with 32 microsteps is
+\begin{equation}
+    \tau_{required} = \SI{7.51e-6}{\newton\meter} \times \frac{100\%}{4.91\%} = \SI{1.53e-4}{\newton\meter}\,.
+\end{equation}
+
+A bipolar NEMA8 stepper motor with specifications shown in \autoref{tab:nema8_specs}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{rl}
+        Basic step angle & $\SI{1.8}{\degree}$                               \\
+        Holding torque   & $180\,\text{g\,cm} = \SI{1.77e-2}{\newton\meter}$ \\
+        Rated voltage    & 3.9~V                                             \\
+        Rated current    & 0.6~A                                             \\
+    \end{tabular}
+    \caption{Specifications of the NEMA8 stepper motor.}
+    \label{tab:nema8_specs}
+\end{table}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{figures/hardware_design/torque_curve.pdf}
+    \caption{Pull-out torque curve of the stepper motor at half step with 24~V and 0.6~A.}
+    \label{fig:torque_curve}
+\end{figure}
+and a pull-out torque curve at half step shown in \autoref{fig:torque_curve} was chosen as the motors for the laser turret. From the pull-out torque curve in \autoref{fig:torque_curve}, the maximum rated speed of the motor is given as 13\,000 points per second at half step $0.9\degree$ which is
+\begin{equation}
+    \num{13000} \div \frac{360}{0.9} = 32.5\,\text{RPM}\,,
+\end{equation}
+with a pull-out torque greater than 100\,g\,cm = $\SI{9.8e-3}{\newton\meter}
+$. The effective torque of the stepper motor at maximum speed with 32 microsteps is
+\begin{equation}
+    \tau_{eff} = \SI{9.8e-3}{\newton\meter} \times 4.91\% = \SI{4.81e-4}{\newton\meter}\,.
+\end{equation}
+The effective torque of the stepper motor at maximum speed is greater than the required torque for the laser turret, therefore the NEMA8 stepper motor is suitable for the laser turret and was also chosen for its compactness which can be seen in \autoref{fig:nema8_dimensions}.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{figures/hardware_design/nema8_side_view.pdf}
+        \caption{Side view.}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}{0.45\textwidth}
+        \includegraphics[width=\linewidth]{figures/hardware_design/nema8_front_view.pdf}
+        \caption{Front view.}
+    \end{subfigure}
+    \caption{Dimensions of the NEMA8 stepper motor.}
+    \label{fig:nema8_dimensions}
+\end{figure}
+
 
 
 
