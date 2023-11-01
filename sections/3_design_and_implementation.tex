@@ -80,7 +80,7 @@ implemented (see \autoref{tab:design_summary}).
 To control the laser, its position must be known in the world co-ordinate frame. The laser position was measured using a camera, thus the camera's pixel co-ordinate frame must be mapped to the world co-ordinate frame. To perform this mapping a camera model is required. The forward imaging model of a camera is shown in \autoref{fig:camera_forward_imaging_model}.
 \begin{figure}
     \centering
-    \includegraphics[width=0.8\textwidth]{figures/camera/forward_imaging_model.png}
+    \includegraphics[width=1\textwidth]{figures/camera/forward_imaging_model.png}
     \caption{Forward imaging model of a camera. CITE}
     \label{fig:camera_forward_imaging_model}
 \end{figure}
@@ -313,18 +313,19 @@ The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The 
 The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosquito_enclosure_dimensions}. The width of the enclosure must be a minimum length of 1 metre. The front facing surface will be transparent and the rest of the surfaces will be white. The enclosure will be fitted with internal lighting to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/hardware_design/rectangular_prism.png}
+    % \includegraphics[width=0.5\textwidth]{figures/hardware_design/rectangular_prism.png}
+    \includegraphics[width=0.7\textwidth]{figures/hardware_design/mos_enclosure.pdf}
     \caption{Mosquito enclosure dimensions.}
     \label{fig:mosquito_enclosure_dimensions}
 \end{figure}
 
 
 
-\subsubsection{System positioning}
+\subsubsection{System positioning}\label{subsubsec:system_positioning}
 The laser turret and the camera will be placed outside the mosquito enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, will be built to hold the laser turret and the camera in place relative to the mosquito enclosure.
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/hardware_design/positioning_bracket.png}
+    \includegraphics[width=1\textwidth]{figures/hardware_design/system_positioning.pdf}
     \caption{System positioning bracket.}
     \label{fig:system_positioning_bracket}
 \end{figure}
@@ -427,7 +428,8 @@ where $I$ is the moment of inertia of the load, which is the mirror, and $\alpha
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.5\textwidth]{figures/hardware_design/rect_inertia.png}
+    % \includegraphics[width=0.5\textwidth]{figures/hardware_design/rect_inertia.png}
+    \includegraphics[width=0.6\textwidth]{figures/hardware_design/inertia_of_rectangle.pdf}
     \caption{Axes and dimensions of a rectangular prism.}
     \label{fig:rect_inertia}
 \end{figure}
@@ -631,14 +633,16 @@ From the enhanced binary frames the co-ordinates of the connected foreground pix
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
-        \includegraphics[width=0.5\linewidth]{figures/detection/square_4_connectivity.png}
+        % \includegraphics[width=0.5\linewidth]{figures/detection/square_4_connectivity.png}
+        \includegraphics[width=0.6\linewidth]{figures/detection/4_pixel_connectivity.pdf}
         \caption{Four connectivity.}
         \label{fig:four_connectivity}
     \end{subfigure}
     \quad
     \begin{subfigure}[b]{0.3\textwidth}
         \centering
-        \includegraphics[width=0.5\linewidth]{figures/detection/square_8_connectivity.png}
+        % \includegraphics[width=0.5\linewidth]{figures/detection/square_8_connectivity.png}
+        \includegraphics[width=0.6\linewidth]{figures/detection/8_pixel_connectivity.pdf}
         \caption{Eight connectivity.}
         \label{fig:eight_connectivity}
     \end{subfigure}
