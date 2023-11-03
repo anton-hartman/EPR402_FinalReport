@@ -17,7 +17,7 @@
     \item Laser detection from first principles optimised with GPU kernels. 1. Gaussian smoothing, 2. Binarise with threshold, 3. Morphological operations (closing and opening), 4. Connected components labelling, 5. Find centroids of connected components, 6. Distinguish laser detections with turret geometry.
     \item Mosquito detection. Same image processing steps expect step 2 is either a less than threshold or background subtraction.
     \item Mosquito tracking using SORT algorithm. (Kalman filter and Hungarian algorithm).
-    \item Laser turret PID controller. Must still be tuned because the error calculated is inaccurate. Should tuning be done without developing a model? Or should a model be developed? How do you develop a model?
+    \item Laser turret PID controller.
     \item Feedback for turret. The current steps are saved at the instance that the frame is captured. The frame is then processed using the laser detection system. The pixel co-ordinates are converted to steps. The step error is calculated and added to the current steps.
     \item System integration on embedded system running in real-time on multiple threads.
 \end{itemize}
@@ -81,6 +81,7 @@ To control the laser, its position must be known in the world co-ordinate frame.
 \begin{figure}
     \centering
     \includegraphics[width=1\textwidth]{figures/camera/forward_imaging_model.png}
+    % \includegraphics[width=1\textwidth]{figures/camera/white_forward_imaging_model.pdf}
     \caption{Forward imaging model of a camera. CITE}
     \label{fig:camera_forward_imaging_model}
 \end{figure}
@@ -341,7 +342,7 @@ The laser turret design was inspired by commercial two-axis laser scanners. The 
     \label{fig:two-axis-scanner-schematic}
 \end{figure}
 
-When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the $xy$-plane mosquito enclosure as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the mirror angle $\theta$ required to shine the laser a distance $d$ relative to the origin of the laser can be calculated using
+When a single axis of the laser turret is considered it can be seen that a right triangle is formed between the laser turret and the $xy$-plane mosquito enclosure as shown in \autoref{fig:mirror_angle}. Using the properties of a right triangle the laser beam angle $\theta$ required to shine the laser a distance $d$ relative to the origin of the laser can be calculated using
 \begin{equation}
     \theta = \arctan{\left(\frac{d}{z}\right)}\,,
     \label{eq:mirror_angle}
@@ -355,7 +356,7 @@ where $z$ is the distance between the turret and the back wall of the mosquito e
 \end{figure}
 
 \newcommand{\requiredLatStepSizeMM}{2}
-The lateral step size of the laser must be a maximum of $\requiredLatStepSizeMM$\,mm. This will ensure that the laser will be able to illuminate every position in the mosquito enclosure since the laser itself will be a few millimetres wide.
+The lateral step size of the laser must be a maximum of $d_{min} = \requiredLatStepSizeMM$\,mm. This will ensure that the laser will be able to illuminate every position in the mosquito enclosure since the laser itself will be a few millimetres wide.
 
 \newcommand{\requiredLatSpeedMPS}{1}
 The required lateral speed is determined in accordance with the field specifications. The longest length of the mosquito enclosure $d_{max}$ will be $\SI{1}{\meter}$. To ensure that the laser can illuminate any set point inside the mosquito enclosure within $\SI{2}{\second}$ of receiving a step input, it was assumed that the laser must be able to move with a velocity $v_{laser}$ of least $\SI{\requiredLatSpeedMPS}{\meter\per\second}$ opposed to the $\SI{0.5}{\meter\per\second}$ required to move the $\SI{1}{\meter}$ length of the mosquito enclosure within $\SI{2}{\second}$. This was done to accommodate for the settling time of the laser turret control system.
@@ -382,7 +383,7 @@ The specific geometry of the laser turret was designed with the goal to practica
 
 \label{par:angular_step_size}
 \paragraph{Angular step size}\mbox{}\\
-The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$. This was conservatively determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
+The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$, which rotates the laser beam through $80\degree$. To accommodate for the mounting and alignment of the mirrors as well as other imperfections it was decided to consider a maximum rotation of $20\degree$, resulting in $\theta_{laser}^{max} = 40\degree$. This was determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
@@ -393,17 +394,18 @@ The turret axis on which the laser beam is first incident on will be referred to
 The minimum distance $z_{min}$ between the laser turret and the mosquito enclosure can be determined by rearranging \autoref{eq:mirror_angle} to give
 \FPeval{\zMinCM}{round(\enclosureHeightCM/tan(40*pi/180), 1)}
 \begin{equation}
-    z_{min} = \frac{d}{\tan\left(\theta\right)} = \frac{\enclosureHeightCM \text{ cm}}{\tan\left(40\degree\right)} = \zMinCM \text{ cm}\,,
+    z_{min} = \frac{d}{\tan\left(\theta_{laser}^{max}\right)} = \frac{\enclosureHeightCM \text{ cm}}{\tan\left(40\degree\right)} = \zMinCM \text{ cm}\,,
 \end{equation}
-where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta = 40\degree$ is the maximum angle through which the first axis of the laser turret can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into \autoref{eq:mirror_angle} to produce
+where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta_{laser}^{max} = 40\degree$ is the maximum angle through which the first axis of the laser turret can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into an equation derived from \autoref{eq:mirror_angle} given by
 \pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
 \begin{equation}
-    \theta_{step}^{max} = \arctan\left({\frac{x_{min}}{z_{min}}}\right) = \arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \FPeval{\roundStepRes}{round(\stepRes, 3)}\roundStepRes\degree\,.
+    \theta_{step}^{max} = \frac{1}{2}\arctan\left({\frac{d_{min}}{z_{min}}}\right) = \frac{1}{2}\arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \frac{\FPeval{\roundStepRes}{round(\stepRes, 3)}\roundStepRes\degree}{2} = \FPeval{\roundStepRes}{round(\stepRes/2, 3)}\roundStepRes\degree\,.
     \label{eq:max_step_resolution}
 \end{equation}
-
+The division by two in \autoref{eq:max_step_resolution} is done to compensate for the fact the laser beam angle is double the mirror angle.
 
 \paragraph{Angular speed}\mbox{}\\
+\hl{MUST DIVIDE BY TWO}
 The maximum angular speed $\omega_{max}$ required by the motors can be determined with $d_{max}$, $v_{laser}$, and $z_{min}$. The maximum angle through which the turret must rotate is
 \begin{equation}
     \theta_{max} = \arctan\left({\frac{d_{max}}{z_{min}}}\right) = \arctan\left({\frac{\SI{1}{\meter}}{\zMinCM \text{ cm}}}\right) = 65.6\degree\,.
@@ -699,15 +701,8 @@ The laser must shine through the front glass of the mosquito enclosure. This res
 The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors changing. The remaining two reflections are distinguished using the geometric properties of the system positioning. The $yz$-plane of the system is shown in \autoref{fig:distinguish_lasers}. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin then the reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
 \begin{figure}[h]
     \centering
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\linewidth]{figures/distinguish_lasers.png}
-        \caption{Laser reflections.}
-    \end{subfigure}
-    \quad
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\linewidth]{figures/distinguish_lasers_zoomed_inflection.png}
-        \caption{Laser reflections zoomed in on the inflection point.}
-    \end{subfigure}
+    \includegraphics[width=\textwidth]{figures/distinguish_lasers.pdf}
+    \caption{Laser reflections.}
     \caption{Distinguishing between the laser's reflections.}
     \label{fig:distinguish_lasers}
 \end{figure}

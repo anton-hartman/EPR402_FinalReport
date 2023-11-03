@@ -13,27 +13,27 @@
     \hline
     \textbf{Intended outcome}                                                                                                                                                    &
     \textbf{Actual outcome}                                                                                                                                                      &
-    \textbf{Location in report}                                                                                                                                                                                                                                                                                                                  \\
+    \textbf{Location in report}                                                                                                                                                                                                                                                                                                                            \\
     \hline
-    \multicolumn{3}{|l|}{\textbf{Core mission requirements and specifications}}                                                                                                                                                                                                                                                                  \\
+    \multicolumn{3}{|l|}{\textbf{Core mission requirements and specifications}}                                                                                                                                                                                                                                                                            \\
     \hline
     The system must track mosquitoes in a mosquito enclosure and illuminate a mosquito every 5 seconds.                                                                          &
     The system tracks mosquitoes in the enclosure and illuminates a mosquito when it is stationary or moves predictably.                                                         &
-    \autoref{sec:results_tracking}                                                                                                                                                                                                                                                                                                               \\
+    Section 4.2.1                                                                                                                                                                                                                                                                                                                                          \\
     \hline
     The laser must be able to illuminate a set point within 2 seconds accurate to within 1 millimetre.                                                                           &
-    Yes                                                                                                                                                                          &
-    sec                                                                                                                                                                                                                                                                                                                                          \\
+    The laser is able to illuminate set point within 2 seconds accurate to within 1 millimetre.                                                                                  &
+    Section 4.2.2                                                                                                                                                                                                                                                                                                                                          \\
     \hline
-    The system must be able to detect mosquitoes with a 90\% accuracy and 5\% false positive rate. The detection must be updated at least every 500 milliseconds.                & Weet nie. The detection is updated every 500 milliseconds.                                                                                              & sec \\
+    The system must be able to detect mosquitoes with a 90\% accuracy and 5\% false positive rate. The detection must be updated at least every 500 milliseconds.                & The system is able to detect mosquitoes with 90\% accuracy. The detection is updated every 500 milliseconds.                                            & Section 4.2.3 \\
     \hline
-    The system must be able to track mosquitoes with 90\% accuracy of correct association between frames after 5 seconds.                                                        & Weet nie.                                                                                                                                               & sec \\
+    The system must be able to track mosquitoes with 90\% accuracy of correct association between frames after 5 seconds.                                                        & The system is able to track mosquitoes with 90\% accuracy or correct association between frames.                                                        & Section 4.2.4 \\
     \hline
-    \multicolumn{3}{|l|}{\textbf{Field condition requirements and specifications}}                                                                                                                                                                                                                                                               \\
+    \multicolumn{3}{|l|}{\textbf{Field condition requirements and specifications}}                                                                                                                                                                                                                                                                         \\
     \hline
-    Mosquitoes should be in an enclosure with controlled lighting and white lining on all the sides except the front facing side. The enclosure should be at least 1 metre wide. & The enclosure has \glspl{led} to control the lighting and white lining on all the sides except the front facing side. The enclosure is 0.9 metres wide. & sec \\
+    Mosquitoes should be in an enclosure with controlled lighting and white lining on all the sides except the front facing side. The enclosure should be at least 1 metre wide. & The enclosure has \glspl{led} to control the lighting and white lining on all the sides except the front facing side. The enclosure is 0.9 metres wide. & sec           \\
     \hline
-    If mosquitoes cannot be obtained a suitable substitute will be used. The substitute will be a similar flying insect.                                                         & Mosquitoes and similar flying insects were obtained. Dead mosquitoes were also used.                                                                    & sec \\
+    If mosquitoes cannot be obtained a suitable substitute will be used. The substitute will be a similar flying insect.                                                         & Mosquitoes and similar flying insects were obtained. Dead mosquitoes were also used.                                                                    & sec           \\
     \hline
   \end{tabularx}
   \caption{Summary of results achieved.}
@@ -71,7 +71,7 @@ The results from three different scenarios are presented in \Cref{fig:q1_1mos_de
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=\textwidth]{figures/results/q1_2mos_prediction_10fps.pdf}
+  \includegraphics[width=0.95\textwidth]{figures/results/q1_2mos_prediction_10fps.pdf}
   \caption{The position of the laser, detected mosquitoes, and predicted mosquitoes with two mosquitoes in the enclosure over time. The laser was set to target the predicted location of the mosquito in this test.}
   \label{fig:q1_2mos_prediction_10fps}
 \end{figure}
@@ -81,6 +81,7 @@ In \Cref{fig:q1_1mos_detection_10fps,fig:q1_1mos_prediction_10fps,fig:q1_2mos_pr
 
 \FloatBarrier
 \textbf{Qualification test 2: Measurement of the time taken for the laser to reach a set point}\\
+
 \textit{Objectives of the test or experiment}\\
 The objective of this experiment is to measure the time it takes for the laser to reach a set point. The requirement states that the laser must be able to illuminate a set point within 2 seconds accurate to within 1 millimetre.
 
@@ -118,6 +119,7 @@ The Nvidia Jetson Nano was used as the embedded platform to control the system. 
 
 \FloatBarrier
 \textbf{Qualification test 3: Test of mosquito detection}\\
+
 \textit{Objectives of the test or experiment}\\
 The objective of this experiment is to determine whether the system can detect mosquitoes in the mosquito enclosure. The requirement states that the system must be able to detect mosquitoes with a 90\% accuracy and 5\% false positive rate. The detection must be updated at least every 500 milliseconds.
 
@@ -125,8 +127,15 @@ The objective of this experiment is to determine whether the system can detect m
 The Nvidia Jetson Nano was used as the embedded platform to control the system. The Raspberry Pi Camera Module V2 was used to capture the video feed. The laser turret developed for this project was used to position the laser. The mosquito enclosure, laser turret, and camera was positioned as described in \autoref{subsubsec:system_positioning}. The Nvidia Jetson Nano was connected to user peripherals for user input and output. C++ code was developed specifically to capture the results for qualification test 3.
 
 \textit{Test setup and experimental parameters}\\
-Dead mosquitoes were glue to white shafts as shown in ...
+Mosquitoes and similar flying insect specimens were glued to white shafts as shown in \autoref{fig:dead_mossies}.
+\begin{figure}
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/results/dead_mossies.jpg}
+  \caption{Dead mosquitoes glued to white shafts.}
+  \label{fig:dead_mossies}
+\end{figure}
 
+The test procedure was as follows:
 \begin{enumerate}
   \item A known number of mosquitoes were inserted into the enclosure.
   \item The detection system was activated for 100 frames.
@@ -135,25 +144,55 @@ Dead mosquitoes were glue to white shafts as shown in ...
 \end{enumerate}
 
 \textit{Results or measurements}\\
+The detection accuracy and false positive rate was determined using
+\begin{equation}
+  \text{Accuracy} = \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} + \text{FP} + \text{FN}}\,,
+\end{equation}
+and
+\begin{equation}
+  \text{False positive rate (FPR)} = \frac{\text{FP}}{\text{FP} + \text{TN}}\,,
+\end{equation}
+
+where TP is the number of true positives, TN is the number of true negatives, FP is the number of false positives, and FN is the number of false negatives. The detection time requirement was determined by calculating the time between each frame.
+
+The true positives, false positives, false negatives, and true negatives are shown in \autoref{fig:detection}. The detection update interval is shown in \autoref{fig:detection_frequency}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/results/detection.pdf}
   \caption{Mosquito detections.}
   \label{fig:detection}
 \end{figure}
-
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/results/detection_frequency.pdf}
-  \caption{Mosquito detection frequency.}
+  \caption{Mosquito detection update interval.}
   \label{fig:detection_frequency}
 \end{figure}
+The detection results for qualification test 3 are summarised in \autoref{tab:detection_results}
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Metric}                & \textbf{Value} \\
+    \hline
+    True Positives                 & 101            \\
+    False Positives                & 0              \\
+    False Negatives                & 1              \\
+    True Negatives                 & 100            \\
+    Accuracy                       & 0.99505        \\
+    False Positive Rate            & 0.0            \\
+    Detection Time Requirement Met & True           \\
+    \hline
+  \end{tabular}
+  \caption{A summary of the detection results.}
+  \label{tab:detection_results}
+\end{table}
 
 \textit{Observations}\\
 The system performs detections within 100 milliseconds which is well within the 500 millisecond requirement. The system is able to detect mosquitoes with a 90\% accuracy and 5\% false positive rate.
 
 \FloatBarrier
-\textbf{Qualification test 4: Test of mosquito tracking}\\
+\textbf{Qualification test 4: Test of mosquito tracking}\label[section]{sec:tracking_quali}\\
 \textit{Objectives of the test or experiment}\\
 The objective of this experiment is to determine whether the system can track mosquitoes in the mosquito enclosure. The requirement states that the system must track mosquitoes in the enclosure with 90\% accuracy after 5 seconds.
 
