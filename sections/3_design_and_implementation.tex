@@ -6,63 +6,55 @@
 
 \section{Design and implementation}
 
-\subsection{Things I made}
-\begin{itemize}
-    \item Laser turret housing.
-    \item Worked out the speed, torque, and step size required for the stepper motors.
-    \item Interfaced with stepper motors using GPIO pins to drive the stepper motor drivers.
-    \item Mapping between camera pixels and real-world co-ordinates. Had to do camera calibration and account for different perspectives of camera and turret.
-    \item Calculate steps from angle required based on distance using Pythagoras.
-    \item Distinguish between laser reflections using the geometry of the laser turret.
-    \item Laser detection from first principles optimised with GPU kernels. 1. Gaussian smoothing, 2. Binarise with threshold, 3. Morphological operations (closing and opening), 4. Connected components labelling, 5. Find centroids of connected components, 6. Distinguish laser detections with turret geometry.
-    \item Mosquito detection. Same image processing steps expect step 2 is either a less than threshold or background subtraction.
-    \item Mosquito tracking using SORT algorithm. (Kalman filter and Hungarian algorithm).
-    \item Laser turret PID controller.
-    \item Feedback for turret. The current steps are saved at the instance that the frame is captured. The frame is then processed using the laser detection system. The pixel co-ordinates are converted to steps. The step error is calculated and added to the current steps.
-    \item System integration on embedded system running in real-time on multiple threads.
-\end{itemize}
+% \subsection{Things I made}
+% \begin{itemize}
+%     \item Laser turret housing.
+%     \item Worked out the speed, torque, and step size required for the stepper motors.
+%     \item Interfaced with stepper motors using GPIO pins to drive the stepper motor drivers.
+%     \item Mapping between camera pixels and real-world co-ordinates. Had to do camera calibration and account for different perspectives of camera and turret.
+%     \item Calculate steps from angle required based on distance using Pythagoras.
+%     \item Distinguish between laser reflections using the geometry of the laser turret.
+%     \item Laser detection from first principles optimised with GPU kernels. 1. Gaussian smoothing, 2. Binarise with threshold, 3. Morphological operations (closing and opening), 4. Connected components labelling, 5. Find centroids of connected components, 6. Distinguish laser detections with turret geometry.
+%     \item Mosquito detection. Same image processing steps expect step 2 is either a less than threshold or background subtraction.
+%     \item Mosquito tracking using SORT algorithm. (Kalman filter and Hungarian algorithm).
+%     \item Laser turret PID controller.
+%     \item Feedback for turret. The current steps are saved at the instance that the frame is captured. The frame is then processed using the laser detection system. The pixel co-ordinates are converted to steps. The step error is calculated and added to the current steps.
+%     \item System integration on embedded system running in real-time on multiple threads.
+% \end{itemize}
 
 
 \subsection{Design summary}
 
 This section summarises the project design tasks and how they were
 implemented (see \autoref{tab:design_summary}).
-
 \begin{table}[H]
     \centering
     \begin{tabularx}{\textwidth}{|X|X|X|}
         \hline
-        \textbf{Deliverable or task}                                                           & \textbf{Implementation} &
+        \textbf{Deliverable or task}                                                                                          & \textbf{Implementation}                                                                               &
         \textbf{Completion of deliverable or task, and section in the report}
         \\
         \hline
-        The mosquito detection subsystem had to be designed and implemented by the student.    &
-        The mosquito detection subsystem was designed and implemented from first principles.   &
+        The laser turret and laser turret control system had to be designed and implemented by the student.                   & The laser turret and laser turret control system were designed and implemented from first principles. & Completed.
+        \\
+        \hline
+        The mosquito and laser detection algorithm had to be designed and implemented on an embedded platform by the student. & The mosquito and laser detection algorithm was designed and implemented from first principles.        & Completed.
+        \\
+        \hline
+        The mosquito tracking and prediction algorithm had to be developed and implemented by the student.                    & The mosquito tracking algorithm and prediction was developed and implemented from first principles.   & Completed.
+        \\
+        \hline
+        An appropriate camera had to be selected by the student.                                                              & An appropriate camera was selected by the student.                                                    & Completed.
+        \\
+        \hline
+        \hline
+        The various subsystems had to be integrated on a real-time embedded system.                                           &
+        The various subsystems were integrated on a real-time embedded system.                                                &
         Completed.
         \\
         \hline
-        The laser detection subsystem had to be designed and implemented by the student.       &
-        The laser detection subsystem was designed and implemented from first principles.      &
-        Completed.
-        \\
-        \hline
-        The laser turret control subsystem had to be designed and implemented by the student.  &
-        The laser turret control subsystem was designed and implemented from first principles. &
-        Completed.
-        \\
-        \hline
-        The mosquito tracking subsystem had to be designed and implemented by the student.     &
-        The mosquito tracking subsystem was designed and implemented from first principles.    &
-        Completed.
-        \\
-        \hline
-        The various subsystems had to be integrated on a real-time embedded system.            &
-        The various subsystems were integrated on a real-time embedded system.                 &
-        Completed.
-        \\
-        \hline
-        Appropriate motors needed to be selected for the laser turret.                         &
-        The stepper motors were selected based on the requirements of the laser turret.        &
+        Appropriate motors needed to be selected for the laser turret.                                                        &
+        The stepper motors were selected based on the requirements of the laser turret.                                       &
         Completed.
         \\
         \hline
@@ -78,55 +70,20 @@ implemented (see \autoref{tab:design_summary}).
 % \sout{To control the laser turret the setpoint and laser position detected with the camera must be converted from the pixels in the camera's co-ordinate frame to the turret's co-ordinate frame. This is done using the camera's intrinsic and extrinsic parameters. The camera's intrinsic parameters are used to convert the pixels to a ray in the camera's co-ordinate frame. The camera's extrinsic parameters are used to convert the ray in the camera's co-ordinate frame to a ray in the turret's co-ordinate frame. The ray in the turret's co-ordinate frame is then converted to the turret's setpoint and laser position. The intrinsic and extrinsic parameters are found using camera calibration.}
 
 To control the laser, its position must be known in the world co-ordinate frame. The laser position was measured using a camera, thus the camera's pixel co-ordinate frame must be mapped to the world co-ordinate frame. To perform this mapping a camera model is required. The forward imaging model of a camera is shown in \autoref{fig:camera_forward_imaging_model}.
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{figures/camera/forward_imaging_model.png}
-    % \includegraphics[width=1\textwidth]{figures/camera/white_forward_imaging_model.pdf}
-    \caption{Forward imaging model of a camera. CITE}
+    \caption{Forward imaging model of a camera. This figure was modified from \cite{Nayar}.}
     \label{fig:camera_forward_imaging_model}
 \end{figure}
 
-Using the forward imaging model the pixel distance was mapped to the metric distance for the x-axis with
+Using the forward imaging model the pixel distance was mapped to the metric distance for the $x$-axis with
 \begin{equation}
     X = Z \times \left( \frac{x - x_{ref}}{f_x} \right)\,,
     \label{eq:pixel_to_metric}
 \end{equation}
-where $Z$ is the depth camera with respect to the world co-ordinate frame, $x$ is the pixel of interest, $x_{ref}$ is the reference pixel, and $f_x$ is the effective focal length of the camera. Similarly, the pixel distance was mapped to the metric distance for the y-axis.
+where $Z$ is the depth camera with respect to the world co-ordinate frame, $x$ is the pixel of interest, $x_{ref}$ is the reference pixel, and $f_x$ is the effective focal length of the camera. Similarly, the pixel distance was mapped to the metric distance for the y-axis. The effective focal length of the camera $f_x$ was determined through camera calibration. The mapping is performed for the $y$-axis.
 
-The effective focal length of the camera $f_x$ was determined through camera calibration.
-
-\subsubsection{Camera calibration}
-\paragraph{Intrinsic parameters}\mbox{}\\
-These parameters are inherent to the camera and remain constant unless the camera's internal settings (like focus) are changed. They are typically found by calibrating the camera using multiple views of a known pattern (like a checkerboard).
-
-\begin{itemize}
-    \item \textbf{Camera Matrix (K)}: Defines the camera's internal characteristics. The principal components are:
-          \begin{equation}
-              K = \begin{bmatrix}
-                  f_x & 0   & c_x \\
-                  0   & f_y & c_y \\
-                  0   & 0   & 1   \\
-              \end{bmatrix}
-          \end{equation}\\
-          where $f_x$ and $f_y$ are the focal lengths in pixels and $c_x, c_y$ are the co-ordinates of the principal point. The principal point is the pixel co-ordinate where the camera's principal axis intersects the image plane.
-
-    \item \textbf{Distortion Coefficients (D)}: Captures lens distortion. This is a vector with up to 5 elements in the common "plumb-bob" model of OpenCV
-          \[
-              D = [k_1, k_2, p_1, p_2, k_3]
-          \]
-          where $k_1, k_2, k_3$ are radial distortion coefficients and $p_1, p_2$ are tangential distortion coefficients.
-\end{itemize}
-
-\paragraph{Extrinsic Parameters}\mbox{}\\
-These parameters capture the camera's orientation and position concerning the world or an external reference frame.
-
-\begin{itemize}
-    \item \textbf{Rotation Vector (rvec)}: Represents the orientation of the camera. It's a 3x1 vector used to derive the rotation matrix $ R $.
-
-    \item \textbf{Translation Vector (tvec)}: Represents the position of the camera. It's a 3x1 vector capturing the translation in X, Y, and Z directions.
-\end{itemize}
-
-They represent the position and orientation of the camera relative to the world (or in your case, the turret's frame). Every time you move the camera or change the scene, these parameters would change. These are found using functions like \verb|solvePnP| in OpenCV, which computes the pose of an object given some known 3D points on the object and their corresponding 2D projections in the image.
 
 \subsubsection{Morphological operations}
 \label{subsubsec:morphological_operations}
@@ -221,12 +178,11 @@ Opening and closing are both idempotent operations, meaning that repeated openin
 \end{figure}
 
 \subsubsection{Kalman filter} \label{subsubsec:kalman_filter}
-The Kalman filter is a recursive algorithm that estimates the state of a system from a series of noisy measurements. It is a powerful tool for tracking the state of a system over time and is widely used in control systems and robotics. The Kalman filter is based on a linear dynamical system model, which is defined by the following equations:
-
+The Kalman filter is a recursive algorithm that estimates the state of a system from a series of noisy measurements. The Kalman filter is based on a linear dynamical system model, which is defined by the following equations:
 \begin{equation}
     \begin{aligned}
-        x_k & = Ax_{k - 1} + Bu_{k - 1} + w_{k - 1} \\
-        z_k & = Hx_k + v_k
+        \mathbf{x}_k & = \mathbf{Ax}_{k - 1} + \mathbf{Bu}_{k - 1} + \mathbf{w}_{k - 1} \\
+        \mathbf{z}_k & = \mathbf{Hx}_k + \mathbf{v}_k
     \end{aligned}
     \label{eq:kalman_filter}
 \end{equation}
@@ -234,14 +190,14 @@ The Kalman filter is a recursive algorithm that estimates the state of a system 
 where
 
 \begin{itemize}
-    \item $x_k$ is the state vector at time $k$.
-    \item $z_k$ is the measurement vector at time $k$.
-    \item $A$ is the state transition matrix.
-    \item $B$ is the control matrix.
-    \item $u_k$ is the control vector at time $k$.
-    \item $w_k$ is the process noise vector at time $k$.
-    \item $H$ is the observation matrix.
-    \item $v_k$ is the measurement noise vector at time $k$.
+    \item $\mathbf{x}_k$ is the state vector at time $k$.
+    \item $\mathbf{z}_k$ is the measurement vector at time $k$.
+    \item $\mathbf{A}$ is the state transition matrix.
+    \item $\mathbf{B}$ is the control matrix.
+    \item $\mathbf{u}_k$ is the control vector at time $k$.
+    \item $\mathbf{w}_k$ is the process noise vector at time $k$.
+    \item $\mathbf{H}$ is the observation matrix.
+    \item $\mathbf{v}_k$ is the measurement noise vector at time $k$.
 \end{itemize}
 
 
@@ -274,11 +230,6 @@ Dependence on Detection: The performance of SORT is highly dependent on the qual
 
 
 
-\subsection{Simulation and Prototyping}
-Detection and tracking done in python with videos.
-
-
-
 \subsection{Hardware design}
 The hardware overview is presented in \autoref{fig:hardware_overview}. The hardware consists primarily of a laser turret, a camera, a mosquito enclosure, and an embedded processing platform. The laser turret is used to move the laser beam across the mosquito enclosure. The camera is used to detect the laser beam and the mosquitoes. A bracket is used to position the laser turret and the camera relative to the mosquito enclosure. The embedded processing platform is used to control the laser turret and perform the image processing required for the laser detection and mosquito detection.
 \begin{figure}[h]
@@ -294,7 +245,7 @@ The hardware overview is presented in \autoref{fig:hardware_overview}. The hardw
 To select an embedded platform for the project the following requirements were considered:
 \begin{description}[style=nextline]
     \item[Processing power] The embedded platform must be able to perform the image processing required for the laser detection and mosquito detection in real-time. Image processing is computationally intensive, but can largely benefit from parallelisation. Therefore, an embedded platform with a \gls{gpu} will be preferred.
-    \item[Memory] The embedded platform must have sufficient memory to store the multiple images along with the required algorithms. A 1080p image with 3 8-bit colour channels requires 6 MB of memory.
+    \item[Memory] The embedded platform must have sufficient memory to store the multiple images along with the required algorithms. A 1080p image with three 8-bit colour channels requires 6 MB of memory.
     \item[Hardware interfaces] The embedded platform must be compatible with camera interfaces. It must also have sufficient \gls{gpio} pins to interface with the stepper motor drivers. The embedded platform must also have support for a display output and a keyboard and mouse input to provide a user interface to control the system.
     \item[Availability and support] It is import to select an embedded platform that is readily available. It is important to select an embedded platform with large body of knowledge available and sufficient scientific support community since this is an individual project without access to people with expertise with the embedded platform.
 \end{description}
@@ -304,9 +255,9 @@ The Nvidia Jetson Nano was chosen as the embedded platform for the project. The 
 
 
 \subsubsection{Camera selection}
-To minimise the computational complexity of the image processing required for the laser detection and mosquito detection a low resolution will be used. The video resolution will not need to exceed 1080p. The camera must be able to capture images at a frame rate of at least 30 frames per second. The camera must also be compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano.
+To minimise the computational complexity of the image processing required for the laser detection and mosquito detection a low video resolution will be used. The video resolution will not need to exceed 1080p. The camera must be able to capture images at a frame rate of at least 30 frames per second. The camera must also be compatible with the \gls{mipi} \gls{csi}-2 interface on the Nvidia Jetson Nano.
 
-The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The Raspberry Pi Camera Module V2 is an 8 MP camera that can capture images at a frame rate of 30 frames per second at 1080p. The Raspberry Pi Camera Module V2 is compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano.
+The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The Raspberry Pi Camera Module V2 is an 8 MP camera that can capture images at a frame rate of 30 frames per second at 1080p. The Raspberry Pi Camera Module V2 is compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano. The Raspberry Pi Camera Module V2 is readily available and has a large body of knowledge available and sufficient scientific support community.
 
 
 
@@ -318,17 +269,6 @@ The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosq
     \includegraphics[width=0.7\textwidth]{figures/hardware_design/mos_enclosure.pdf}
     \caption{Mosquito enclosure dimensions.}
     \label{fig:mosquito_enclosure_dimensions}
-\end{figure}
-
-
-
-\subsubsection{System positioning}\label{subsubsec:system_positioning}
-The laser turret and the camera will be placed outside the mosquito enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, will be built to hold the laser turret and the camera in place relative to the mosquito enclosure.
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=1\textwidth]{figures/hardware_design/system_positioning.pdf}
-    \caption{System positioning bracket.}
-    \label{fig:system_positioning_bracket}
 \end{figure}
 
 
@@ -351,7 +291,7 @@ where $z$ is the distance between the turret and the back wall of the mosquito e
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{figures/hardware_design/mirror_angle.png}
-    \caption{Mirror angle calculation.}
+    \caption{The right triangle formed between the laser turret and the mosquito enclosure.}
     \label{fig:mirror_angle}
 \end{figure}
 
@@ -365,15 +305,45 @@ The required lateral speed is determined in accordance with the field specificat
 
 
 \subsection{Hardware implementation}
-
-
-
 \subsubsection{Mosquito enclosure}
 \newcommand{\enclosureWidthCM}{90} % cm
 \newcommand{\enclosureHeightCM}{38} % cm
 \newcommand{\enclosureDepthCM}{32} % cm
 
-The mosquito enclosure was constructed from a second hand glass fish tank with dimensions $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm. All the surfaces other than front facing surface was retrofitted with a white lining. Internal \glspl{led} were added to the enclosure, shining from the top and bottom surfaces to minimise shadows on the back surface the enclosure, to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
+The mosquito enclosure was constructed from a second hand glass fish tank with dimensions in the form $xyz$ given by $\enclosureWidthCM \times \enclosureHeightCM \times \enclosureDepthCM$ cm. All the surfaces other than front facing surface was retrofitted with a white lining. Internal \glspl{led} were added to the enclosure, shining from the top and bottom surfaces to minimise shadows on the back surface the enclosure, to ensure contrast between the background and the mosquitoes and to minimise the camera noise.
+
+
+
+\subsubsection{System positioning}\label{subsubsec:system_positioning}
+The laser turret and the camera was placed outside the mosquito enclosure in known positions relative to the enclosure. The bracket, shown in \autoref{fig:system_positioning_bracket}, was built to hold the laser turret and the camera in place relative to the mosquito enclosure.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/hardware_design/system_positioning.pdf}
+    \caption{System positioning bracket.}
+    \label{fig:system_positioning_bracket}
+\end{figure}
+
+
+\subsubsection{Camera mounting}
+The camera was mounted on the bracket in \autoref{fig:system_positioning_bracket} using a 3D printed camera mount. The camera mount was designed to be adjustable to ensure that the camera can be positioned in the centre of the mosquito enclosure. The camera was design in \gls{cad}. The camera mount is shown in \autoref{fig:camera_mount_and_base_clamp}.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/camera_and_middle_clamp.png}
+        \caption{Camera mount.}
+        \label{fig:camera_mount}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figures/hardware_design/camera_base_clamp.png}
+        \caption{Camera base clamp.}
+        \label{fig:camera_base_clamp}
+    \end{subfigure}
+    \caption{The camera mount and camera base clamp.}
+    \label{fig:camera_mount_and_base_clamp}
+\end{figure}
 
 
 
@@ -383,7 +353,7 @@ The specific geometry of the laser turret was designed with the goal to practica
 
 \label{par:angular_step_size}
 \paragraph{Angular step size}\mbox{}\\
-The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$, which rotates the laser beam through $80\degree$. To accommodate for the mounting and alignment of the mirrors as well as other imperfections it was decided to consider a maximum rotation of $20\degree$, resulting in $\theta_{laser}^{max} = 40\degree$. This was determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter width of the mosquito enclosure and the second axis moves the laser beam parallel to the longer length of the mosquito enclosure.
+The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$, which rotates the laser beam through $80\degree$. This was determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. To accommodate for the mounting and alignment of the mirrors as well as other imperfections it was decided to consider a maximum rotation of $20\degree$, resulting in $\theta_{laser}^{max} = 40\degree$. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter height of the mosquito enclosure and the second axis moves the laser beam parallel to the longer width of the mosquito enclosure.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
@@ -396,7 +366,7 @@ The minimum distance $z_{min}$ between the laser turret and the mosquito enclosu
 \begin{equation}
     z_{min} = \frac{d}{\tan\left(\theta_{laser}^{max}\right)} = \frac{\enclosureHeightCM \text{ cm}}{\tan\left(40\degree\right)} = \zMinCM \text{ cm}\,,
 \end{equation}
-where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta_{laser}^{max} = 40\degree$ is the maximum angle through which the first axis of the laser turret can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into an equation derived from \autoref{eq:mirror_angle} given by
+where $d = \enclosureHeightCM$~cm is the height of the mosquito enclosure and $\theta_{laser}^{max} = 40\degree$ is the maximum angle through which the first axis of the laser can rotate. The maximum step resolution $\theta_{step}^{max}$ of the motors can be calculated by substituting $z_{min}$ and the required lateral step size $d_{min}$ into an equation derived from \autoref{eq:mirror_angle} given by
 \pgfmathsetmacro{\stepRes}{atan2(\requiredLatStepSizeMM, \zMinCM*10)}
 \begin{equation}
     \theta_{step}^{max} = \frac{1}{2}\arctan\left({\frac{d_{min}}{z_{min}}}\right) = \frac{1}{2}\arctan\left({\frac{\requiredLatStepSizeMM \text{mm}}{\zMinCM \text{cm}}}\right) = \frac{\FPeval{\roundStepRes}{round(\stepRes, 3)}\roundStepRes\degree}{2} = \FPeval{\roundStepRes}{round(\stepRes/2, 3)}\roundStepRes\degree\,.
@@ -406,7 +376,7 @@ The division by two in \autoref{eq:max_step_resolution} is done to compensate fo
 
 \paragraph{Angular speed}\mbox{}\\
 \hl{MUST DIVIDE BY TWO}
-The maximum angular speed $\omega_{max}$ required by the motors can be determined with $d_{max}$, $v_{laser}$, and $z_{min}$. The maximum angle through which the turret must rotate is
+The maximum angular speed $\omega_{max}$ required by the motors can be determined with $d_{max}=1$\,m, $v_{laser}=\SI{1}{\meter\per\second}$, and $z_{min}=\zMinCM$\,cm. The maximum angle through which the turret must rotate is
 \begin{equation}
     \theta_{max} = \arctan\left({\frac{d_{max}}{z_{min}}}\right) = \arctan\left({\frac{\SI{1}{\meter}}{\zMinCM \text{ cm}}}\right) = 65.6\degree\,.
 \end{equation}
@@ -443,7 +413,7 @@ where $M$ is the mass of the rectangular prism and $b$ and $c$ are the dimension
 \begin{equation}
     V = abc\,,
 \end{equation}
-where $a$, $b$, and $c$ are the dimensions of the rectangular prism. The dimensions of the rectangular prism is given by the chosen mirror dimensions as $a = 30\,\text{mm}$, $b = 15\,\text{mm}$, and $c = 3\,\text{mm}$. The mass of the mirror $M$ is
+where $a$, $b$, and $c$ are the dimensions of the rectangular prism. The dimensions of the rectangular prism are given by the chosen mirror dimensions as $a = 30\,\text{mm}$, $b = 15\,\text{mm}$, and $c = 3\,\text{mm}$. The mass of the mirror $M$ is
 \begin{equation}
     M = \rho V = \SI{2500}{\kg\per\meter\cubed} \times (30\,\text{mm})(15\,\text{mm})(3\,\text{mm}) = 3.38\,\text{g}\,.
 \end{equation}
@@ -468,11 +438,11 @@ Given the calculated moment of inertia and angular acceleration the required tor
 
 
 \paragraph{Motor and driver selection}\hfill\\
-Typical stepper motors have a basic step angle of $1.8\degree$. This does not meat the required step resolution $\theta_{step}^{max} = 0.253\degree$, however the step angle can be reduced by using microstepping. Microstepping works by interpolating the \gls{pwm} signal to the stepper motor driver to produce intermediate step positions between the basic step positions. Stepper motor drivers that support up to 16 microsteps are readily available. Drivers that support up to 256 microsteps are also available. The step angle $\theta_{step}$ of a stepper motor using 8 microsteps is
+Typical stepper motors have a basic step angle of $1.8\degree$. This does not meet the required step resolution $\theta_{step}^{max} = 0.253\degree$, however the step angle can be reduced by using microstepping. Microstepping works by interpolating the \gls{pwm} signal to the stepper motor driver to produce intermediate step positions between the basic step positions. Stepper motor drivers that support up to 16 microsteps are readily available. Drivers that support up to 256 microsteps are also available. The step angle $\theta_{step}$ of a stepper motor using 16 microsteps is
 \begin{equation}
     \theta_{step} = \frac{1.8\degree}{16} = 0.1125\degree\,,
 \end{equation}
-which is sufficient to meet the maximum required step resolution $\theta_{step}^{max} = 0.253\degree$. Therefore, a typical stepper motor with a basic step angle of $1.8\degree$ operated using at least 8 microsteps will be sufficient.
+which is sufficient to meet the required maximum step resolution $\theta_{step}^{max} = 0.253\degree$. Therefore, a typical stepper motor with a basic step angle of $1.8\degree$ operated using at least 16 microsteps will be sufficient.
 
 A drawback of using microstepping is that the effective torque of the stepper motor is reduced with each increase in microstepping. The torque reduction due to microstepping can be calculated with
 \begin{equation}
@@ -485,7 +455,7 @@ where
     \item $S$ is the reciprocal of the number of microsteps.
 \end{itemize}
 
-The effective torque of a stepper motor for the full range of microsteps available is tabulated in \autoref{tab:effective_torque}. It can be seen that microstepping has a drastic impact of the effective torque of the stepper motor. Thus, the required torque will need to be calculated for the chosen microstepping operation.
+The effective torque of a stepper motor for the full range of microsteps available is tabulated in \autoref{tab:effective_torque}. It can be seen that microstepping has a drastic impact of the effective torque of stepper motors. Thus, the required torque will need to be calculated for the chosen microstepping operation.
 \begin{table}[h]
     \centering
     \begin{tabular}{|c|c|}
@@ -557,9 +527,22 @@ The effective torque of the stepper motor at maximum speed is greater than the r
 
 
 \paragraph{Laser selection and activation circuit}\hfill\\
-A low-powered 5~mW red laser with adjustable focus was chosen for the laser turret. The laser has an operating voltage range of $2.8 - 5.2$\,V. A low-powered laser was chosen for safety. The adjustable focus enabled the laser beam to be focused to a small spot size on the back wall of the mosquito enclosure. The laser must be red since the image processing will be done using on the red channel of the \gls{rgb} video frame.
+A low-powered 5\,mW red laser with adjustable focus was chosen for the laser turret. The laser has an operating voltage range of $2.8 - 5.2$\,V. A low-powered laser was chosen for safety. The adjustable focus enabled the laser beam to be focused to a small area on the back wall of the mosquito enclosure. The laser must be red since the image processing will be done using only the red channel of the \gls{rgb} video frame.
 
-The 3.3~V \gls{gpio} of the Nvidia Jetson Nano cannot supply enough current to power the laser. A transistor circuit was designed to enable the laser to be turned on and off from the Nvidia Jetson Nano \gls{gpio}.
+The 3.3\,V \gls{gpio} of the Nvidia Jetson Nano cannot supply enough current to power the laser. A switching transistor circuit was designed to enable the laser to be turned on and off from the Nvidia Jetson Nano \gls{gpio}. The schematic for the switching transistor circuit can be seen in \autoref{fig:transistor_schematic}.  When the input signal is high the transistor is switched on and the laser is powered. When the input signal is low the transistor is switched off and the laser is not powered. In \autoref{fig:transistor_schematic}, $R1$ is a pull-down resistor to ensure that the input signal is low when the Nvidia Jetson Nano is not driving the input signal. $R2$ and $D1$ represent the laser.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/hardware_design/laser_transistor_schematic.pdf}
+    \caption{Switching transistor circuit.}
+    \label{fig:transistor_schematic}
+\end{figure}
+This circuit was realised on a veroboard as shown in \autoref{fig:transistor_circuit}, with $R1 = 56\,k\Omega$ to limit the current through the base of the transistor. The transistor used was a 2N2222A transistor with a maximum collector current of 800\,mA and a maximum collector-emitter voltage of 4\,V.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.3\textwidth]{figures/hardware_design/transistor_circuit.jpg}
+    \caption{Transistor circuit.}
+    \label{fig:transistor_circuit}
+\end{figure}
 
 
 \paragraph{Laser turret \gls{cad}}
