@@ -10,38 +10,53 @@
 
 \subsubsection{Interpretation of results}
 \paragraph{Laser turret}\hfill\\
-The laser turret performs well with sufficient feedback frequency. In \autoref{fig:q2_laser_errors}, it can be seen that the laser reaches the target position accurate to within 6 pixels for all tests with one exception. This is accurate to within 1 millimetre of the target position given the measured radii of the laser beam and a known 2 millimetre disc. These measurements indicate that anything within 8 pixels is accurate to within 1 millimetre
+The laser turret performs well with sufficient feedback frequency. In \autoref{fig:q2_laser_errors}, it can be seen that the laser reaches the target position accurate to within 6 pixels for all tests with one exception. This is accurate to within 1 millimetre of the target position given the measured radii of the laser beam and a known 2 millimetre disc. These measurements indicate that anything within 8 pixels is accurate to within 1 millimetre. In run 1 of \autoref{fig:q2_laser_to_setpoint}, it can be seen that the laser plateaus for about 300\,ms before reaching the target position. This is likely due to a false negative laser detection. The laser position error is not updated for period of false negative detections and thus no control action is taken since the control system is unaware of the error. The laser turret generally reaches the target position well within the 2 second specification.
 
 \paragraph{Mosquito detection}\hfill\\
-
-
-\paragraph{Laser detection}\hfill\\
+The mosquito detection system performs with 99\% accuracy and 0\% false positive rate under the test conditions. This excellent performance that is well within the specifications of 90\% accuracy and less than 5\% false positive rate. However, the detection system was tested using a small set of  specimens that were available. The specimens were dead mosquitoes and other similar flying insects that were glued to white shafts for testing purposes. This means that the robustness of the detection system cannot be accurately evaluated due to a lack of sufficient test data.
 
 
 \paragraph{Mosquito tracking}\hfill\\
+The mosquito tracking system is only able to accurately predict the future location of a mosquito if moves predictably for a sufficient period of time.
 
 
 \paragraph{Overall system performance}\hfill\\
 
 \subsubsection{Critical evaluation}
+The Nvidia Jetson Nano was ideally suited for this project. The detection system could be improved by performing \gls{ccl} on the \gls{gpu} rather than the \gls{cpu}.
 
-\subsubsection{Unsolved problems}
+\subsubsection{Unsolved problems}\label{sec:unsolved_problems}
+The system does not account for the slight difference in perspectives between the camera and the laser. This difference in perspective is inevitable due to the physical separation of the camera and the laser required to ensure that the laser and camera do not obstruct each other's point of view of the mosquito enclosure. The difference in perspective results two different physical locations of the laser beam corresponding to the same two-dimensional point in the camera's pixel co-ordinate frame. The two physical locations correspond to the point in the $xy$-plane in which the mosquito is and the point on the $xy$-plane of the back wall of the mosquito enclosure. The laser turret will always settle on the physical location that corresponds to the point on the back wall of the mosquito enclosure. This is not a problem when the difference in depth between the $xy$-plane of the back wall of the enclosure and the $xy$-plane in which the mosquito is is small. Through testing the maximum depth at which this difference is not problematic was found to be approximately half the depth of the mosquito enclosure. To resolve this problem it is necessary to determine the depth of the mosquito which is being tracked. This requires additional hardware such as a depth camera or a second camera with a known separation from the first camera. The depth of the mosquito can then be determined using triangulation.
+
+The feedback from the camera based laser detection system is the only mechanism that the system has to sense the position of the laser turret's motors. This means that if the laser beam is outside the video frame the system has no way of knowing the position of the laser turret. This is problematic when the target position of the laser turret is near the edge of the video frame. When the target position is near the edge of the video frame the laser beam is likely to go outside the video frame due to overshoot and system inaccuracies. When this happens the system is unable to determine the required control action to return the laser to within the video frame since the feedback required to determine this control action is unavailable. This problem can be resolved by adding position encoders to the motors of the laser turret. This will enable the system to determine the position of the laser turret even when the laser beam is outside the video frame, albeit with less accuracy.
+
 
 \subsubsection{Strong points of the design}
+The system is can operate in a variety of external lighting conditions. This is because of the internal lighting in the mosquito enclosure that is used to control the lighting conditions in the enclosure.
+
+The lightweight design of the processing components of the system allow the system to operate at multiple frames per second. The higher the frame rate the better the performance of the system.
 
 \subsubsection{Expected failure conditions}
+The mosquito detection system will fail to detect a mosquito if the mosquito is not large enough to create sufficient contrast between itself and the background of the mosquito enclosure.
+
+The system will fail when the mosquito is more than half the depth of the mosquito enclosure away from the back wall of the mosquito enclosure as discussed in \autoref{sec:unsolved_problems}.
 
 \subsection{Considerations in the design}
 
 \subsubsection{Ergonomics}
+The system has been designed to be modular to facilitate easy transportation of the system. The system is easy to assemble with the correct placement of components with the use of the system positioning bracket that can be seen in \autoref{fig:system_positioning_bracket}. The system has user-friendly \glspl{gui}. The main \gls{gui} displays the mosquito tracking and laser targeting in real-time as well as critical system information. The system enables manual control of the laser turret via the terminal. The system has a host of parameters that can be adjusted at runtime to optimise the performance of the system for the field conditions. The system also has numerous display options with different levels of granularity to facilitate debugging and optimisation of the system. At any stage of operation the user can type `\texttt{?}' into the terminal to view the current commands available.
 
 \subsubsection{Health and safety}
+Direct eye contact with the laser beam can be harmful to the user. A low-powered laser diode was used to minimise the risk of eye damage. A laser activation circuit was also designed to mitigate the risk of accidental laser eye contact. The laser is powered off by default and must be activated by the user through the terminal. The laser can easily be deactivated through the terminal with the single key command `\texttt{l}'. The presence of live mosquitoes in the mosquito enclosure poses a health risk to the user. The mosquito enclosure is designed with mesh openings that can easily be opened and closed to allow access the enclosure with minimal risk of mosquitoes escaping.
 
 \subsubsection{Environmental impact}
+The system does not create any pollutants or harmful emissions. If the system reaches its end of life, the system can be disassembled and most of its components can be recycled. The embedded platform, the motors, and the laser can be repurposed for other applications.
 
 \subsubsection{Social and legal impact}
+The 5\,mW laser used in the system does not require a permit or compliance with specific regulations to operate. If the system is improved to operate within residential areas the system could prevent the spread of malaria and other mosquito-borne diseases. The system could also be used to prevent the spread of other insect-borne diseases such as the Zika virus.
 
 \subsubsection{Ethics clearance}
+The system does not require ethics clearance.
 
 \newpage
 
