@@ -173,15 +173,14 @@ The detection results for qualification test 3 are summarised in \autoref{tab:de
   \centering
   \begin{tabular}{|l|l|}
     \hline
-    \textbf{Metric}                & \textbf{Value} \\
+    \textbf{Metric}     & \textbf{Value} \\
     \hline
-    True Positives                 & 101            \\
-    False Positives                & 0              \\
-    False Negatives                & 1              \\
-    True Negatives                 & 100            \\
-    Accuracy                       & 0.99505        \\
-    False Positive Rate            & 0.0            \\
-    Detection Time Requirement Met & True           \\
+    True Positives      & 599            \\
+    False Positives     & 0              \\
+    False Negatives     & 1              \\
+    True Negatives      & 100            \\
+    Accuracy            & 0.998571       \\
+    False Positive Rate & 0.0            \\
     \hline
   \end{tabular}
   \caption{A summary of the detection results.}
@@ -189,12 +188,12 @@ The detection results for qualification test 3 are summarised in \autoref{tab:de
 \end{table}
 
 \textit{Observations}\\
-The system performs detections within 100 milliseconds which is well within the 500 millisecond requirement. The system is able to detect mosquitoes with a 90\% accuracy and 5\% false positive rate.
+The system performs detections within 100 milliseconds which is well within the 500 millisecond requirement. The system is able to detect mosquitoes with a 99\% accuracy and 0\% false positive rate.
 
 \FloatBarrier
 \textbf{Qualification test 4: Test of mosquito tracking}\label[section]{sec:tracking_quali}\\
 \textit{Objectives of the test or experiment}\\
-The objective of this experiment is to determine whether the system can track mosquitoes in the mosquito enclosure. The requirement states that the system must track mosquitoes in the enclosure with 90\% accuracy after 5 seconds.
+The objective of this experiment is to determine whether the system can track mosquitoes in the mosquito enclosure. The requirement states that the system must track mosquitoes in the enclosure with 90\% correct association after 5 seconds.
 
 \textit{Equipment used}\\
 The Nvidia Jetson Nano was used as the embedded platform to control the system. The Raspberry Pi Camera Module V2 was used to capture the video feed. The laser turret developed for this project was used to position the laser. The mosquito enclosure, laser turret, and camera was positioned as described in \autoref{subsubsec:system_positioning}. The Nvidia Jetson Nano was connected to user peripherals for user input and output. C++ code was developed specifically to capture the results for qualification test 4.

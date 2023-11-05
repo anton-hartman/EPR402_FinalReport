@@ -22,12 +22,12 @@ The same considerations were made for the object detection algorithm to detect t
 
 The multi-target tracking algorithm is required to track and predict the locations of mosquitoes. This can be efficiently achieved using a Kalman filter for one object. The Kalman filter is a recursive algorithm that can be used to estimate the state of a system that is subject to random noise. The Kalman filter is able to recursively predict the future state of a system, which is required to predict the future locations of a mosquito. This can be extended to track multiple objects using the \gls{sort} algorithm that combines the Kalman filter and the Hungarian algorithm. The Hungarian algorithm is an optimal assignment algorithm that can be used to assign detections to tracks. The \gls{sort} algorithm is less computationally complex than other multi-target tracking algorithms while maintaining a comparable or higher accuracy \cite{SORT-Bewley2017}.
 
-A high-level overview of the system can be seen in \autoref{fig:functional_block_diagram}. The system was designed to operate in a controlled environment.
+A high-level overview of the system can be seen in \autoref{fig:system_overview}. The system was designed to operate in a controlled environment.
 \begin{figure}[h]
       \centering
-      \includegraphics[width=1\textwidth]{figures/function_block_diagram.drawio.pdf}
-      \caption{Functional block diagram of the system.}
-      \label{fig:functional_block_diagram}
+      \includegraphics[width=1\textwidth]{figures/system_overview.pdf}
+      \caption{Overview of the system.}
+      \label{fig:system_overview}
 \end{figure}
 
 \newpage
