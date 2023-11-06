@@ -95,7 +95,7 @@ The Nvidia Jetson Nano was used as the embedded platform to control the system. 
 \end{enumerate}
 
 \textit{Results or measurements}\\
-\autoref{fig:q2_laser_to_setpoint} shows the position of the laser over time for multiple runs with different starting points with a constant setpoint. \autoref{fig:q2_laser_errors} shows the Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and set points. \autoref{fig:q2_laser_errors} has been restricted to the time range of 1200 to 2200 milliseconds such that the exact error between laser and setpoint can be observed. The radius of the laser was measured to a minimum of 5 pixels. The radius of a 2 millimetre disc was measured to be an average 2 pixels.
+\autoref{fig:q2_laser_to_setpoint} shows the position of the laser over time for multiple runs with different starting points with a constant setpoint. \autoref{fig:q2_laser_errors} shows the Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and setpoints. \autoref{fig:q2_laser_errors} has been restricted to the time range of 1200 to 2200 milliseconds such that the exact error between laser and setpoint can be observed. The radius of the laser was measured to a minimum of 5 pixels. The radius of a 2 millimetre disc was measured to be an average 2 pixels.
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/results/q2.pdf}
@@ -105,12 +105,12 @@ The Nvidia Jetson Nano was used as the embedded platform to control the system. 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/results/q2_errors.pdf}
-  \caption{The Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and set points.}
+  \caption{The Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and setpoints.}
   \label{fig:q2_laser_errors}
 \end{figure}
 
 \textit{Observations}\\
-\autoref{fig:q2_laser_to_setpoint} shows the position of the laser over time for multiple runs with different starting points with a constant setpoint. It can be seen that general behaviour of the control system adjusts the position of the laser to move towards the setpoint. \autoref{fig:q2_laser_errors} shows the Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and set points. The graph is restricted to the time range of 1200 to 2200 milliseconds which is after the position of the laser has stabilised. It can be seen from the various tests that the maximum Euclidean distance between the laser and the setpoint is less the 8 pixels.
+\autoref{fig:q2_laser_to_setpoint} shows the position of the laser over time for multiple runs with different starting points with a constant setpoint. It can be seen that general behaviour of the control system adjusts the position of the laser to move towards the setpoint. \autoref{fig:q2_laser_errors} shows the Euclidean distance between the laser and the setpoint in pixels for multiple runs with different starting points and setpoints. The graph is restricted to the time range of 1200 to 2200 milliseconds which is after the position of the laser has stabilised. It can be seen from the various tests that the maximum Euclidean distance between the laser and the setpoint is less the 8 pixels.
 
 \FloatBarrier
 \textbf{Qualification test 3: Test of mosquito detection}\\
@@ -213,7 +213,7 @@ Mosquitoes were simulated with a small black dot attached to a white shafts.
 \end{figure}
 
 \textit{Observations}\\
-In \autoref{fig:q4_tracking}, it can be seen that the system is able correctly associate the mosquitoes between frames. The detected and predicted paths travelled by the mosquitoes are plotted. It can be seen that the predicted locations significantly deviates from the detected locations when there is a change in the direction of the path travelled by the mosquito. Three mosquitoes were tracked in this test.
+In \autoref{fig:q4_tracking}, it can be seen that the system is able to correctly associate the mosquitoes between frames. The detected and predicted paths travelled by the mosquitoes are plotted. It can be seen that the predicted locations significantly deviates from the detected locations when there is a change in the direction of the path travelled by the mosquito. Three mosquitoes were tracked in this test.
 
 \newpage
 
