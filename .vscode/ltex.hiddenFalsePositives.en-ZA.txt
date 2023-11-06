@@ -1,1 +1,4 @@
 {"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qmosquito air defence system proportional-integral-derivative general purpose input/output revolutions per minute graphics processing unit central processing unit light emitting diode red, green, blue connected components labelling simple online and real-time tracking compute unified device architecture mobile industry processor interface camera serial interface universal serial bus pulse width modulation computer aided design\\E$"}
+{"rule":"CD_NN","sentence":"^\\QA low-powered 5 mW red laser with adjustable focus was chosen for the laser turret.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_ZA","sentence":"^\\QIt can be seen from the various tests that the maximum Euclidean distance between the laser and the setpoint is less the 8 pixels.\\E$"}
+{"rule":"THE_NN_AND_THE_NN","sentence":"^\\QIt can be seen from the various tests that the maximum Euclidean distance between the laser and the setpoint is less the 8 pixels.\\E$"}

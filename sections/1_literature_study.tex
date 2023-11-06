@@ -17,11 +17,11 @@ An alternative to the appearance based detection approaches is to detect objects
 Tracking-by-detection approaches are more suitable for the proposed mosquito defence system. Tracking-by-detection approaches are based on the detection of objects in a scene and the tracking of the detected objects. Tracking-by-detection can be performed using particle filter-based tracking. A particle filter considers the proximity and behaviour of other targets. In the case of social insect tracking, it is known that two targets cannot occupy the same space, and targets will actively avoid collisions. The joint particle tracker proposed in \cite{Khan2003} is highly accurate but unfortunately, it suffers from exponential complexity. This computational complexity is not feasible in real-time multi-target tracking system.
 
 The \gls{sort} algorithm proposed in \cite{SORT-Bewley2017} has a main focus to associate objects efficiency for online and real-time applications. The \gls{sort} uses the combination of a Kalman filter and the Hungarian algorithm. The Kalman filter is an optimal linear state estimator. The Hungarian algorithm is an optimal assignment algorithm. The performance of the \gls{sort} algorithm can be seen in \autoref{fig:sort_performance}.
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.6\textwidth]{figures/sort_performance.png}
-  \caption{Performance of the \gls{sort} algorithm \cite{SORT-Bewley2017}.}
-  \label{fig:sort_performance}
+\begin{figure}[!htb]
+      \centering
+      \includegraphics[width=0.6\textwidth]{figures/sort_performance.png}
+      \caption{Performance of the \gls{sort} algorithm \cite{SORT-Bewley2017}.}
+      \label{fig:sort_performance}
 \end{figure}
 The \gls{sort} algorithm employs a Kalman filter for each object that is being tracked. The Kalman filter is used to predict the future location of the object. The Hungarian algorithm is used to assign detections to tracks. The Kalman filter requires a series of matrix operations to be performed for each object that is being tracked. The Hungarian algorithm has a time complexity of $O\left(n!\right)$. The computational complexity of the \gls{sort} tracking makes it suitable for the proposed mosquito defence system.
 

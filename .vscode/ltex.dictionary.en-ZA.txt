@@ -1,2 +1,11 @@
 parallelisation
 Jetson
+setpoint
+binarised
+binarisation
+binarising
+microsteps
+microstepping
+Microstepping
+Microsteps
+Binarisation

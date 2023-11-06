@@ -243,7 +243,7 @@ The mosquito enclosure will be a rectangular prism as shown in \autoref{fig:mosq
 
 
 
-\subsubsection{Laser turret}\label{subsubsec:laser_turret_design}
+\subsubsection{Laser turret}\label{subsubsec:laser_turret_implementation}
 The laser turret design was inspired by commercial two-axis laser scanners. The position of the laser beam is controlled by adjusting the angles of two mirrors. This is illustrated in \autoref{fig:two-axis-scanner-schematic}. The mirrors are connected directly to the output shaft of the motors. The laser turret will be positioned orthogonally to the $xy$-plane of the mosquito enclosure. The point where the laser beam shines orthogonal to the $xy$-plane of the mosquito enclosure is considered the origin of the laser. This will occur when the two mirrors are at 45$\degree$ relative to the laser beam.
 \begin{figure}[!htb]
   \centering
@@ -269,7 +269,7 @@ where $z$ is the distance between the turret and the back wall of the mosquito e
 The lateral step size of the laser must be a maximum of $d_{min} = \requiredLatStepSizeMM$\,mm. This will ensure that the laser will be able to illuminate every position in the mosquito enclosure since the laser itself will be a few millimetres wide.
 
 \newcommand{\requiredLatSpeedMPS}{1}
-The required lateral speed is determined in accordance with the field specifications. The longest length of the mosquito enclosure $d_{max}$ will be $\SI{1}{\meter}$. To ensure that the laser can illuminate any set point inside the mosquito enclosure within $\SI{2}{\second}$ of receiving a step input, it was assumed that the laser must be able to move with a velocity $v_{laser}$ of least $\SI{\requiredLatSpeedMPS}{\meter\per\second}$ opposed to the $\SI{0.5}{\meter\per\second}$ required to move the $\SI{1}{\meter}$ length of the mosquito enclosure within $\SI{2}{\second}$. This was done to accommodate for the settling time of the laser turret control system.
+The required lateral speed is determined in accordance with the field specifications. The longest length of the mosquito enclosure $d_{max}$ will be $\SI{1}{\meter}$. To ensure that the laser can illuminate any setpoint inside the mosquito enclosure within $\SI{2}{\second}$ of receiving a step input, it was assumed that the laser must be able to move with a velocity $v_{laser}$ of least $\SI{\requiredLatSpeedMPS}{\meter\per\second}$ opposed to the $\SI{0.5}{\meter\per\second}$ required to move the $\SI{1}{\meter}$ length of the mosquito enclosure within $\SI{2}{\second}$. This was done to accommodate for the settling time of the laser turret control system.
 
 
 
@@ -552,6 +552,22 @@ The laser turret was designed in \gls{cad} using Autodesk Fusion 360. The laser 
 \end{figure}
 
 
+\subsubsection{Final system assembly}
+The final assembly of the full system can be seen in \autoref{fig:side_view}.
+The laser turret and camera configuration can be seen up close in \autoref{fig:turret_and_camera}.
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/fotos/naas_side_view.png}
+  \caption{Full system assembly.}
+  \label{fig:side_view}
+\end{figure}
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.43\textwidth]{figures/fotos/turret_and_camera_cropped.jpg}
+  \caption{Turret and camera.}
+  \label{fig:turret_and_camera}
+\end{figure}
+
 
 \FloatBarrier
 \subsection{Software design}\label{subsec:software_design}
@@ -578,7 +594,7 @@ The goal of the morphological operations is to ensure that all the foreground pi
 
 The noise and erroneously joint sections are removed using the morphological opening operation. Opening has been formally defined in \autoref{subsubsec:morphological_operations}. The opening of $A$ by $B$ is the union of all translations of $B$ that are completely contained in $A$ as illustrated in \autoref{fig:opening}. The holes and erroneously disjointed sections are removed using the morphological closing operation. Closing has been formally defined \autoref{subsubsec:morphological_operations}. The closing of $A$ by $B$ is the complement of the union of all translations of $B$ that do not overlap $A$ as illustrated in \autoref{fig:closing}.
 
-The structuring element must be identical independent of orientation in a 2D image since the orientation of the mosquitoes will be unknown. The structuring element will therefore be a disc. The size of the disc will be adjusted independently for the opening and closing operations for both the mosquito and laser detection. The structuring elements' size will be adjustable at runtime such that they can be tuned to provide optimal performance.
+The structuring element must be identical, independent of orientation, in a 2D image since the orientation of the mosquitoes will be unknown. The structuring element will therefore be a disc. The size of the disc will be adjusted independently for the opening and closing operations for both the mosquito and laser detection. The structuring elements' size will be adjustable at runtime such that they can be tuned to provide optimal performance.
 
 
 \paragraph{Connected components labelling}\label{par:ccl}\mbox{}\\
@@ -630,7 +646,7 @@ Various algorithms exist to perform \gls{ccl}. Two of the most commonly used alg
     \State \text{continue}
     \EndIf
     \State $labels[y][x] \gets label$
-    \For{each neighbor $(nx, ny)$ of $(x, y)$}
+    \For{each neighbour $(nx, ny)$ of $(x, y)$}
     \State $\text{Enqueue}(queue, (nx, ny))$
     \EndFor
     \EndWhile
@@ -648,7 +664,7 @@ The laser must shine through the front glass of the mosquito enclosure. This res
   \item The reflection of interest, which is the reflection of the laser beam incident on a mosquito or the back surface of the enclosure.
 \end{itemize}
 
-The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors changing. Thus, this reflection can be manually distinguished by drawing a bounding box around its position in the frame. The remaining two reflections are distinguished using the geometric properties of the system positioning. The $yz$-plane of the system is shown in \autoref{fig:distinguish_lasers} showing the potential laser beam paths for various turret angles. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin then the  reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
+The reflection off the front glass at the origin of the laser turret remains stationary since the laser turret itself is stationary with only the angles of the mirrors changing. Thus, this reflection can be manually distinguished by drawing a bounding box around its position in the frame. The remaining two reflections are distinguished using the geometric properties of the system positioning. The $yz$-plane of the system is shown in \autoref{fig:distinguish_lasers} showing the potential laser beam paths for various turret angles. The laser turret is slightly below the camera which is exaggerated in \autoref{fig:distinguish_lasers} for illustration purposes. It can be seen in \autoref{fig:distinguish_lasers} that if both detections are at or below the camera origin, the reflection of interest is closer to the camera origin. If both reflections are at or above the camera origin, then the  reflection of interest is further from the camera origin. If the reflections are on either side of the camera origin, the reflection of interest is the reflection above the camera origin. This logic is easily extended to three dimensions by considering the $yz$-plane and $xz$-plane independently.
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=\textwidth]{figures/distinguish_lasers.pdf}
@@ -704,7 +720,7 @@ where $\mathbf{u}_k$ is the input vector, which is the acceleration of the mosqu
     0                          & \sigma_{\dot{y}}\sigma_{y} & 0                          & \sigma_{\dot{y}}^2
   \end{bmatrix}\,,
 \end{equation}
-where $\sigma_{x}$ and $\sigma_{\dot{x}}$ are the standard deviations of the position and velocity, respectively. The standard deviation of the position is defined as the standard deviation of the acceleration $\sigma_{\ddot{x}}$ multiplied by $\frac{1}{2}\Delta t^2$ since this is the effect that the acceleration will have on the position as shown in \autoref{eq:mosquito_kinematic_equation}. Similarly, the standard deviation of the velocity is defined as $\Delta t \sigma_{\ddot{x}}$. Therefore, the process noise covariance can be written as
+where $\sigma_{x}$ and $\sigma_{\dot{x}}$ are the standard deviations of the position and velocity, respectively. The standard deviation of the position is defined as the standard deviation of the acceleration $\sigma_{\ddot{x}}$ multiplied by $\frac{1}{2}\Delta t^2$, since this is the effect that the acceleration will have on the position as shown in \autoref{eq:mosquito_kinematic_equation}. Similarly, the standard deviation of the velocity is defined as $\Delta t \sigma_{\ddot{x}}$. Therefore, the process noise covariance can be written as
 \begin{equation}
   \mathbf{Q} =
   \sigma_{\ddot{x}}^{2}
@@ -746,7 +762,7 @@ The Kalman filter is initialised with the position of the mosquito as the initia
 \paragraph{Association}\mbox{}\\
 The association of tracks and detections will be done using the Hungarian algorithm, which is an optimised optimal assignment algorithm. The Hungarian algorithm has a time complexity of $O\left(n!\right)$ compared to the time complexity na\"ive approach $O\left(n^3\right)$. The Hungarian algorithm works as follows:
 \begin{description}[style=nextline]
-  \item[Generate a cost matrix.] Represent the problem with a square $n \times n$ matrix $\mathbf{C}$ where the element $\mathbf{C}_{i,j}$ represents the cost of assigning track $i$ to detection $j$. The cost function is the euclidean distance between the predicted location and the detected location of the mosquito.
+  \item[Generate a cost matrix.] Represent the problem with a square $n \times n$ matrix $\mathbf{C}$ where the element $\mathbf{C}_{i,j}$ represents the cost of assigning track $i$ to detection $j$. The cost function is the Euclidean distance between the predicted location and the detected location of the mosquito.
   \item[Row and column reduction.] Subtract the minimum value in each row from each element in the row. Perform the same operation for each column. This will produce a matrix with at least one zero in each row and column.
   \item[Cover zeros and check for optimality.] Cover all the zeros in the matrix using the minimum number of horizontal and vertical lines. If the minimum number of covering lines is $n$, an optimal assignment exists among the zeros, and the algorithm can proceed to the assignment phase. If not, you need to adjust the matrix and repeat from this step.
   \item[Adjust the matrix.] Find the smallest element that is not covered by any line. Subtract this element from all uncovered elements, and add it to all elements at the intersections of the covering lines. Return to \textit{cover zeros and check for optimality}.
@@ -761,7 +777,7 @@ The laser turret control system is a closed-loop \gls{pid} controller. A \gls{pi
   \label{eq:pid_controller}
   u(t) = K_p e(t) + K_i \int_{0}^{t} e(\tau) d\tau + K_d \frac{de(t)}{dt}\,,
 \end{equation}
-where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the proportional gain, $K_i$ is the integral gain, and $K_d$ is the derivative gain. The goal of the laser turret control system is to position the laser beam at the target co-ordinates. The target co-ordinates is defined by the mosquito detection and tracking system in pixels. The stepper motors are controlled in steps, thus the target pixels must be mapped to the number of steps required to move the laser beam to the target co-ordinates. The steps are defined in reference to the origin of the laser defined in \autoref{subsubsec:laser_turret_design}, which is the position when the laser beam is perpendicular to the $xy$-plane of the mosquito enclosure. The block diagram of the laser turret control system can be seen in \autoref{fig:control_system}. The two axes of the laser turret are controlled independently each having their own \gls{pid} controller. The \gls{pid} controller is implemented in software and the control signal is sent to the stepper motor drivers using \gls{gpio}.
+where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the proportional gain, $K_i$ is the integral gain, and $K_d$ is the derivative gain. The goal of the laser turret control system is to position the laser beam at the target co-ordinates. The target co-ordinates is defined by the mosquito detection and tracking system in pixels. The stepper motors are controlled in steps, thus the target pixels must be mapped to the number of steps required to move the laser beam to the target co-ordinates. The steps are defined in reference to the origin of the laser defined in \autoref{subsubsec:laser_turret_design}, which is the position when the laser beam is perpendicular to the $xy$-plane of the mosquito enclosure. The block diagram of the laser turret control system can be seen in \autoref{fig:control_system}. The two axes of the laser turret are controlled independently, each having their own \gls{pid} controller. The \gls{pid} controller is implemented in software and the control signal is sent to the stepper motor drivers using \gls{gpio}.
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/control_system.pdf}
@@ -856,23 +872,6 @@ The system was programmed in C++ and integrated into a single executable system.
 \end{figure}
 
 The laser turret control system in threads 2 and 3 continuously poll flags that indicate whether there is new feedback available for laser position, and whether there is a new target position available. If either is available the control system breaks out of the loop that provides the pulses to drive the stepper motors. The new data is used to update required control action determined by the \gls{pid} controller. The system then resumes to drive the stepper motors until the control action is completed, or new data is available.
-
-The full system can be seen in \autoref{fig:side_view}.
-\begin{figure}
-  \centering
-  \includegraphics[width=0.8\textwidth]{figures/fotos/naas_side_view.png}
-  \caption{A side view of the system.}
-  \label{fig:side_view}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=0.5\textwidth]{figures/fotos/turret_and_camera_cropped.jpg}
-  \caption{Turret and camera.}
-  \label{fig:turret_and_camera}
-\end{figure}
-
-
 
 \newpage
 
