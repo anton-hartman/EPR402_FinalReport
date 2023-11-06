@@ -14,7 +14,7 @@ A literature review was conducted on modern tracking systems. The hardware and s
 \subsection{Summary of the observations and findings}
 The system can successfully track mosquitoes in real-time with high accuracy. The laser turret control system performs as expected reaching a setpoint within 2 seconds. The system is able to target a mosquito with the laser turret and illuminate it under certain conditions. \autoref{fig:q1_1mos_prediction_10fps} shows the targeting performance is dependent on the mosquito's flight path.
 
-It was discovered that the accuracy of the predicted position of a mosquito is highly dependent on linearity of the mosquito's flight. The accuracy of the predictions can be improved with a more accurate model of the mosquito's flight. A more accurate model should be developed by considering the specific environment in which the mosquito is flying. A host seeking mosquito will fly differently to a captured in an enclosure.
+It was discovered that the accuracy of the predicted position of a mosquito is highly dependent on linearity of the mosquito's flight. The accuracy of the predictions can be improved with a more accurate model of the mosquito's flight. A more accurate model should be developed by considering the specific environment in which the mosquito is flying. For example, a host seeking mosquito will fly differently compared to a mosquito flying in an enclosure.
 
 \subsection{Contribution}
 New software that the student had to master to complete this project was multi-threading in C++ and \gls{gpu} programming with \gls{cuda}. Multi-threading was required to simultaneously track mosquitoes and control the laser turret to target a mosquito. \gls{cuda} was required to accelerate the image processing algorithms to achieve real-time performance. Multi-threading and \gls{gpu} programming is not something that undergraduate students would typically have any knowledge of and is not covered in any undergraduate modules.
@@ -25,7 +25,7 @@ The student was required to map camera pixels to real-world co-ordinates. In ord
 
 The student was required master embedded development on the Nvidia Jetson Nano. The software for this project was developed by the student without the reliance on existing libraries, with two exceptions. The student relied on existing libraries for hardware interfacing and the implementation of Hungarian algorithm was taken directly from an existing software module. The hardware for the laser turret was developed by the student.
 
-Bi-weekly consultations were held with the student's study leader. The student's study leader provided guidance on the project concept development and the design aspects to focus on. The student's study leader did not provide any assistance with the design and implementation of the project.
+Bi-monthly meetings were held with the student's study leader. The student's study leader provided guidance on the project concept development and the design aspects to focus on. The student's study leader did not provide any assistance with the design and implementation of the project.
 
 
 \subsection{Future work}
@@ -33,7 +33,7 @@ The model used to represent the flight of a mosquito is a major area in which fu
 
 An alternative design would include additional hardware that can be used to detect the depth of a mosquito. This would allow the system to target mosquitoes at any depth irrespective of the difference in perspective between the camera and the laser turret.
 
-Finally, the system should be further optimised to increase the frame rate at which the system can operate. This will improve the accuracy with which the position of a mosquito can be predicted, since the predictions will be corrected more frequently. This will also improvement the targeting performance of the laser turret, since feedback on the true laser position will be received more frequently.
+Finally, the system should be further optimised to increase the frame rate at which the system can operate. This will improve the accuracy with which the position of a mosquito can be predicted, since the predictions will be corrected more frequently. This will also improve the targeting performance of the laser turret, since feedback on the true laser position will be received more frequently.
 \newpage
 
 %% End of File.
