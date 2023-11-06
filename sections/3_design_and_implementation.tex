@@ -110,7 +110,7 @@ The erosion and dilation operations are illustrated in \autoref{fig:erosion_and_
     \caption{The dilation of a dark-blue square by a disk, resulting in the light-blue square with rounded corners.}
     \label{fig:dilation}
   \end{subfigure}
-  \caption{The figure shows an example of erosion and dilation. This figure was modified from Renatokeshet at the English Wikipedia (2008).}
+  \caption{The figure shows an example of erosion and dilation. This figure was modified from \cite{Renatokeshet_2023}.}
   \label{fig:erosion_and_dilation}
 \end{figure}
 
@@ -154,7 +154,7 @@ Opening and closing are both idempotent operations, meaning that repeated openin
     \caption{The closing of the dark-blue shape (union of two squares) by a disk, resulting in the union of the dark-blue shape and the light-blue areas.}
     \label{fig:closing}
   \end{subfigure}
-  \caption{The figure shows and example of opening and closing. This figure was modified from Renatokeshet at the English Wikipedia (2008).}
+  \caption{The figure shows and example of opening and closing. This figure was modified from \cite{Renatokeshet_2023}.}
   \label{fig:opening_and_closing}
 \end{figure}
 
@@ -162,14 +162,12 @@ Opening and closing are both idempotent operations, meaning that repeated openin
 The Kalman filter is a recursive algorithm that estimates the state of a system from a series of noisy measurements. The Kalman filter is based on a linear dynamical system model, which is defined by the following equations:
 \begin{equation}
   \begin{aligned}
-    \mathbf{x}_k & = \mathbf{Ax}_{k - 1} + \mathbf{Bu}_{k - 1} + \mathbf{w}_{k - 1} \\
-    \mathbf{z}_k & = \mathbf{Hx}_k + \mathbf{v}_k
+    \mathbf{x}_k & = \mathbf{Ax}_{k - 1} + \mathbf{Bu}_{k - 1} + \mathbf{w}_{k - 1}\,, \\
+    \mathbf{z}_k & = \mathbf{Hx}_k + \mathbf{v}_k\,,
   \end{aligned}
   \label{eq:kalman_filter}
 \end{equation}
-
 where
-
 \begin{itemize}
   \item $\mathbf{x}_k$ is the state vector at time $k$.
   \item $\mathbf{z}_k$ is the measurement vector at time $k$.
@@ -181,35 +179,39 @@ where
   \item $\mathbf{v}_k$ is the measurement noise vector at time $k$.
 \end{itemize}
 
+The Kalman filter algorithm can be divided into two phases: the prediction phase and the update phase. The equations for the prediction phase is
+\begin{equation}
+  \begin{aligned}
+    \hat{\mathbf{x}}_k^- & = \mathbf{A}\hat{\mathbf{x}}_{k - 1} + \mathbf{B}\mathbf{u}_{k - 1}\,, \\
+    \mathbf{P}_k^-       & = \mathbf{AP}_{k - 1}\mathbf{A}^T + \mathbf{Q}\,,
+  \end{aligned}
+  \label{eq:kalman_filter_prediction}
+\end{equation}
+where
+\begin{itemize}
+  \item $\hat{\mathbf{x}}_k^-$ is the a priori state estimate at time $k$.
+  \item $\mathbf{P}_k^-$ is the a priori error covariance matrix at time $k$.
+  \item $\mathbf{Q}$ is the process noise covariance matrix.
+\end{itemize}
 
-\subsubsection{SORT tracking} \label{subsubsec:sort_tracking}
-SORT (Simple Online and Realtime Tracking) is a popular algorithm for multi-object tracking in video sequences. The main goal of the SORT algorithm is to associate detection boxes across frames in a video sequence to form trajectories for each individual object. Here is a theoretical background on the SORT tracking algorithm:
-1. Overview
+The equations for the update phase is
+\begin{equation}
+  \begin{aligned}
+    \mathbf{K}_k       & = \mathbf{P}_k^-\mathbf{H}^T(\mathbf{HP}_k^-\mathbf{H}^T + \mathbf{R})^{-1}\,,          \\
+    \hat{\mathbf{x}}_k & = \hat{\mathbf{x}}_k^- + \mathbf{K}_k(\mathbf{z}_k - \mathbf{H}\hat{\mathbf{x}}_k^-)\,, \\
+    \mathbf{P}_k       & = (\mathbf{I} - \mathbf{K}_k\mathbf{H})\mathbf{P}_k^-\,,
+  \end{aligned}
+  \label{eq:kalman_filter_update}
+\end{equation}
+where
+\begin{itemize}
+  \item $\mathbf{K}_k$ is the Kalman gain at time $k$.
+  \item $\hat{\mathbf{x}}_k$ is the a posteriori state estimate at time $k$.
+  \item $\mathbf{P}_k$ is the a posteriori error covariance matrix at time $k$.
+  \item $\mathbf{R}$ is the measurement noise covariance matrix.
+\end{itemize}
 
-SORT is designed to be both simple and efficient, achieving real-time performance. It is based on the tracking-by-detection paradigm, which means it relies on an external object detector to provide bounding boxes around objects of interest in each frame. The algorithm then associates these detections across frames to create tracks.
-2. Detection
-
-Before tracking, an object detection algorithm (such as Faster R-CNN, YOLO, or SSD) is applied to each frame to detect objects of interest. The output is a set of bounding boxes along with their associated confidence scores.
-3. Association
-
-The core of the SORT algorithm is the association step, where detections are linked across frames to form tracks. This is done based on the intersection over union (IoU) metric, which measures the overlap between two bounding boxes. The steps involved are:
-
-Prediction: For each existing track, the Kalman filter is used to predict the new position of the object in the current frame.
-Matching: The predicted positions of existing tracks are matched with the current frame's detections based on the IoU metric. A bipartite graph matching algorithm (such as the Hungarian algorithm) is used to find the optimal assignment.
-Update: The Kalman filter for each matched track is updated with the current detection.
-Creation and Deletion: New tracks are created for detections that could not be matched to existing tracks. Tracks that have not been matched for a certain number of frames are deleted.
-
-4. Kalman Filter
-
-The Kalman filter is a critical component of the SORT algorithm, providing a way to predict and update the state of the tracks based on the detections. The state of a track is represented as $[x,y,\dot{x},\dot{y}]$, where x,yx,y are the co-ordinates of the centre of the bounding box, ss is the scale/area of the bounding box, rr is the aspect ratio, and $\dot{x},\dot{y}$ are the respective velocities.
-5. Challenges and Limitations
-
-Occlusions: SORT can struggle with objects that are occluded or interact closely with each other, as the IoU metric may not be sufficient for correct association.
-Identity Switches: In cases where objects cross paths or are close together, SORT can suffer from identity switches.
-Dependence on Detection: The performance of SORT is highly dependent on the quality of the detections provided by the external object detector.
-
-
-
+The Kalman filter, initialised with an initial state estimate $\hat{\mathbf{x}}_0$ and error covariance $\mathbf{P}_0$, is a recursive, adaptive, and linear estimator that optimally minimises the mean square error for real-time state estimation of linear systems with computational efficiency.
 
 \FloatBarrier
 \subsection{Hardware design}
@@ -232,7 +234,7 @@ To select an embedded platform for the project the following requirements were c
   \item[Availability and support] It is import to select an embedded platform that is readily available. It is important to select an embedded platform with large body of knowledge available and sufficient scientific support community since this is an individual project without access to people with expertise with the embedded platform.
 \end{description}
 
-The Nvidia Jetson Nano was chosen as the embedded platform for the project. The Nvidia Jetson Nano is a single-board computer with a \gls{gpu} and a quad-core \gls{cpu}. The Nvidia Jetson Nano has a \gls{mipi} \gls{csi}-2 camera interface and has 40 \gls{gpio} pins. The Jetson Nano has a quad-core ARM Cortex-A57 MPCore processor, an Nvidia Maxwell \gls{gpu} with 128 \gls{cuda} cores, and 4 GB of LPDDR4 memory. It also features an HDMI display output and a \gls{usb} 3.0 port. The Nvidia Jetson Nano is readily available and has a large body of knowledge available and sufficient scientific support community.
+The Nvidia Jetson Nano was chosen as the embedded platform for the project. The Nvidia Jetson Nano is a single-board computer with a \gls{gpu} and a quad-core \gls{cpu}. The Nvidia Jetson Nano has a \gls{mipi} \gls{csi}-2 camera interface and has 40 \gls{gpio} pins. The Jetson Nano has a quad-core ARM Cortex-A57 MPCore processor, an Nvidia Maxwell \gls{gpu} with 128 \gls{cuda} cores, and 4 GB of LPDDR4 memory. It also features an HDMI display output and a USB 3.0 port. The Nvidia Jetson Nano is readily available and has a large body of knowledge available and sufficient scientific support community.
 
 
 
@@ -336,10 +338,16 @@ The specific geometry of the laser turret was designed with the goal to practica
 \label{par:angular_step_size}
 \paragraph{Angular step size}\mbox{}\\
 The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$, which rotates the laser beam through $80\degree$. This was determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. To accommodate for the mounting and alignment of the mirrors as well as other imperfections it was decided to consider a maximum rotation of $20\degree$, resulting in $\theta_{laser}^{max} = 40\degree$. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter height of the mosquito enclosure and the second axis moves the laser beam parallel to the longer width of the mosquito enclosure.
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
+%   \caption{Rotation range of first axis with chosen mirror dimensions.}
+%   \label{fig:turret_motion_range}
+% \end{figure}
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
-  \caption{Rotation range of first axis with chosen mirror dimensions.}
+  \includegraphics[width=\textwidth]{figures/anton hoeke.pdf}
+  \caption{The rotation range of the first axis with chosen mirror dimensions.}
   \label{fig:turret_motion_range}
 \end{figure}
 
@@ -763,7 +771,7 @@ The association of tracks and detections will be done using the Hungarian algori
   \item[Row and column reduction.] Subtract the minimum value in each row from each element in the row. Perform the same operation for each column. This will produce a matrix with at least one zero in each row and column.
   \item[Cover zeros and check for optimality.] Cover all the zeros in the matrix using the minimum number of horizontal and vertical lines. If the minimum number of covering lines is $n$, an optimal assignment exists among the zeros, and the algorithm can proceed to the assignment phase. If not, you need to adjust the matrix and repeat from this step.
   \item[Adjust the matrix.] Find the smallest element that is not covered by any line. Subtract this element from all uncovered elements, and add it to all elements at the intersections of the covering lines. Return to \textit{cover zeros and check for optimality}.
-  \item[Assignment.] Once an optimal assignment is found, read the assignment from the zeros in the matrix. \sout{Each row will have exactly one zero, and each column may have one zero. If a column has no zeros, the track corresponding to that column is unassigned. If a column has more than one zero, the track corresponding to that column is assigned to the detection corresponding to the zero that is covered by a star. If a row has more than one zero, the track corresponding to that row is assigned to the detection corresponding to the zero that is covered by a star.}
+  \item[Assignment.] Once an optimal assignment is found, read the assignment from the zeros in the matrix.
 \end{description}
 
 
