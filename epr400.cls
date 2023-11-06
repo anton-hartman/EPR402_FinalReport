@@ -508,7 +508,7 @@
 }
 
 % Less detailed TOC
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
 
 %% Set to single line spacing as required.
 \renewcommand{\baselinestretch}{1.0}

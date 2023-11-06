@@ -16,27 +16,16 @@ implemented (see \autoref{tab:design_summary}).
     \textbf{Completion of deliverable or task, and section in the report}
     \\
     \hline
-    The laser turret and laser turret control system had to be designed and implemented by the student.                   & The laser turret and laser turret control system were designed and implemented from first principles. & Completed.
+    The laser turret and laser turret control system had to be designed and implemented by the student.                   & The laser turret and laser turret control system were designed and implemented from first principles. & Completed. \newline \Cref{subsec:hardware_design,subsec:hardware_implementation,subsec:software_design,subsec:software_implementation}
     \\
     \hline
-    The mosquito and laser detection algorithm had to be designed and implemented on an embedded platform by the student. & The mosquito and laser detection algorithm was designed and implemented from first principles.        & Completed.
+    The mosquito and laser detection algorithm had to be designed and implemented on an embedded platform by the student. & The mosquito and laser detection algorithm was designed and implemented from first principles.        & Completed. \newline \Cref{subsec:software_design,subsec:software_implementation}
     \\
     \hline
-    The mosquito tracking and prediction algorithm had to be developed and implemented by the student.                    & The mosquito tracking algorithm and prediction was developed and implemented from first principles.   & Completed.
+    The mosquito tracking and prediction algorithm had to be developed and implemented by the student.                    & The mosquito tracking algorithm and prediction was developed and implemented from first principles.   & Completed. \newline \Cref{subsec:software_design,subsec:software_implementation}
     \\
     \hline
-    An appropriate camera had to be selected by the student.                                                              & An appropriate camera was selected by the student.                                                    & Completed.
-    \\
-    \hline
-    \hline
-    The various subsystems had to be integrated on a real-time embedded system.                                           &
-    The various subsystems were integrated on a real-time embedded system.                                                &
-    Completed.
-    \\
-    \hline
-    Appropriate motors needed to be selected for the laser turret.                                                        &
-    The stepper motors were selected based on the requirements of the laser turret.                                       &
-    Completed.
+    An appropriate camera had to be selected by the student.                                                              & An appropriate camera was selected by the student.                                                    & Completed. \newline \Cref{subsubsec:camera_selection}
     \\
     \hline
   \end{tabularx}
@@ -48,8 +37,6 @@ implemented (see \autoref{tab:design_summary}).
 \subsection{Theoretical analysis and modelling}
 
 \subsubsection{Mapping pixel co-ordinates to metric co-ordinates}
-% \sout{To control the laser turret the setpoint and laser position detected with the camera must be converted from the pixels in the camera's co-ordinate frame to the turret's co-ordinate frame. This is done using the camera's intrinsic and extrinsic parameters. The camera's intrinsic parameters are used to convert the pixels to a ray in the camera's co-ordinate frame. The camera's extrinsic parameters are used to convert the ray in the camera's co-ordinate frame to a ray in the turret's co-ordinate frame. The ray in the turret's co-ordinate frame is then converted to the turret's setpoint and laser position. The intrinsic and extrinsic parameters are found using camera calibration.}
-
 To control the laser, its position must be known in the world co-ordinate frame. The laser position was measured using a camera, thus the camera's pixel co-ordinate frame must be mapped to the world co-ordinate frame. To perform this mapping a camera model is required. The forward imaging model of a camera is shown in \autoref{fig:camera_forward_imaging_model}.
 \begin{figure}[h]
   \centering
@@ -214,7 +201,7 @@ where
 The Kalman filter, initialised with an initial state estimate $\hat{\mathbf{x}}_0$ and error covariance $\mathbf{P}_0$, is a recursive, adaptive, and linear estimator that optimally minimises the mean square error for real-time state estimation of linear systems with computational efficiency.
 
 \FloatBarrier
-\subsection{Hardware design}
+\subsection{Hardware design}\label{subsec:hardware_design}
 The hardware block diagram is presented in \autoref{fig:hardware_block}. The hardware consists primarily of a laser turret, a camera, a mosquito enclosure, and an embedded processing platform. The laser turret is used to move the laser beam across the mosquito enclosure. The camera is used to detect the laser beam and the mosquitoes. A bracket is used to position the laser turret and the camera relative to the mosquito enclosure. The embedded processing platform is used to control the laser turret and perform the image processing required for the laser detection and mosquito detection.
 \begin{figure}[h]
   \centering
@@ -238,7 +225,7 @@ The Nvidia Jetson Nano was chosen as the embedded platform for the project. The 
 
 
 
-\subsubsection{Camera selection}
+\subsubsection{Camera selection}\label{subsubsec:camera_selection}
 To minimise the computational complexity of the image processing required for the laser detection and mosquito detection a low video resolution will be used. The video resolution will not need to exceed 1080p. The camera must be able to capture images at a frame rate of at least 30 frames per second. The camera must also be compatible with the \gls{mipi} \gls{csi}-2 interface on the Nvidia Jetson Nano.
 
 The Raspberry Pi Camera Module V2 was chosen as the camera for the project. The Raspberry Pi Camera Module V2 is an 8 MP camera that can capture images at a frame rate of 30 frames per second at 1080p. The Raspberry Pi Camera Module V2 is compatible with the \gls{mipi} \gls{csi} on the Nvidia Jetson Nano. The Raspberry Pi Camera Module V2 is readily available and has a large body of knowledge available and sufficient scientific support community.
@@ -288,7 +275,7 @@ The required lateral speed is determined in accordance with the field specificat
 
 
 \FloatBarrier
-\subsection{Hardware implementation}
+\subsection{Hardware implementation}\label{subsec:hardware_implementation}
 \subsubsection{Mosquito enclosure}
 \newcommand{\enclosureWidthCM}{90} % cm
 \newcommand{\enclosureHeightCM}{38} % cm
@@ -331,19 +318,13 @@ The camera was mounted on the bracket in \autoref{fig:system_positioning_bracket
 
 
 
-\subsubsection{Laser turret}
+\subsubsection{Laser turret}\label{subsubsec:laser_turret_design}
 The specific geometry of the laser turret was designed with the goal to practically obtain a sufficiently small lateral step size of the laser on the back wall of the mosquito enclosure, while maintaining sufficient speed. The dimensions of the mirrors were chosen for practicality as $30 \times 15 \times 3$~mm.
 
 
 \label{par:angular_step_size}
 \paragraph{Angular step size}\mbox{}\\
 The turret axis on which the laser beam is first incident on will be referred to as the first axis and the other axis will be referred to as the second axis for the remainder of this discussion. The rotation range of the first axis is bounded by the geometry of the turret since the laser beam reflected from the first axis must be incident on the second axis. With the chosen mirror dimensions, the maximum angle through which the first axis can rotate is $40\degree$, which rotates the laser beam through $80\degree$. This was determined geometrically in the to scale drawing in \autoref{fig:turret_motion_range}. To accommodate for the mounting and alignment of the mirrors as well as other imperfections it was decided to consider a maximum rotation of $20\degree$, resulting in $\theta_{laser}^{max} = 40\degree$. The rotation range of the second axis is not bounded by the geometry of the laser turret since the laser beam reflected from the second axis is incident on the mosquito enclosure. Therefore, the laser turret will be oriented such that the first axis moves the laser beam parallel to the shorter height of the mosquito enclosure and the second axis moves the laser beam parallel to the longer width of the mosquito enclosure.
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=0.6\textwidth]{figures/hardware_design/rotation_range_of_first_axis.pdf}
-%   \caption{Rotation range of first axis with chosen mirror dimensions.}
-%   \label{fig:turret_motion_range}
-% \end{figure}
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/anton hoeke.pdf}
@@ -517,7 +498,7 @@ The effective torque of the stepper motor at maximum speed is greater than the r
 \end{figure}
 
 
-\paragraph{Laser selection and activation circuit}\hfill\\
+\paragraph{Laser selection and activation circuit}\label{par:laser_activation}\hfill\\
 A low-powered 5\,mW red laser with adjustable focus was chosen for the laser turret. The laser has an operating voltage range of $2.8 - 5.2$\,V. A low-powered laser was chosen for safety. The adjustable focus enabled the laser beam to be focused to a small area on the back wall of the mosquito enclosure. The laser must be red since the image processing will be done using only the red channel of the \gls{rgb} video frame.
 
 The 3.3\,V \gls{gpio} of the Nvidia Jetson Nano cannot supply enough current to power the laser. A switching transistor circuit was designed to enable the laser to be turned on and off from the Nvidia Jetson Nano \gls{gpio}. The schematic for the switching transistor circuit can be seen in \autoref{fig:transistor_schematic}.  When the input signal is high the transistor is switched on and the laser is powered. When the input signal is low the transistor is switched off and the laser is not powered. In \autoref{fig:transistor_schematic}, $R1$ is a pull-down resistor to ensure that the input signal is low when the Nvidia Jetson Nano is not driving the input signal. $R1$ was chosen as $56\,k\Omega$ to limit the current drawn from the Nvidia Jetson Nano \gls{gpio}. With $R1 = 56\,k\Omega$ the current drawn from the \gls{gpio} is $\frac{3.3\,V}{56\,k\Omega} = 59\,\mu A$. $R2$ and $D1$ represent the laser.
@@ -573,7 +554,7 @@ The laser turret was designed in \gls{cad} using Autodesk Fusion 360. The laser 
 
 
 \FloatBarrier
-\subsection{Software design}
+\subsection{Software design}\label{subsec:software_design}
 \subsubsection{Mosquito and laser detection} \label{subsubsec:mosquito_and_laser_detection}
 It was assumed that the mosquitoes would be the only dark blobs in the enclosure and that the laser's reflections would be the only bright blobs in the enclosure. The video frame will be cropped such that only the white back surface of the enclosure is visible. To reduce the computational complexity of the image processing only the red channel of the \gls{rgb} frame will be used, hence, the necessity of the red laser.
 
@@ -792,9 +773,7 @@ where $u(t)$ is the control signal, $e(t)$ is the error signal, $K_p$ is the pro
 
 
 \FloatBarrier
-\subsection{Software implementation and optimisation}
-
-
+\subsection{Software implementation and optimisation}\label{subsec:software_implementation}
 \subsubsection{Image processing}
 The resolution of the camera was set to $1280 \times 720$ and was cropped such that only the back wall of the mosquito enclosure is visible. This low resolution was selected to reduce the computational complexity of the image processing. The binarisation and image enhancement processes described in \autoref{subsubsec:mosquito_and_laser_detection} are suitable for parallelisation. Therefore, custom \gls{cuda} kernels were written to perform these operations on the Nvidia Jetson Nano \gls{gpu}. The kernel for the morphological erosion operation is shown in \autoref{lst:erosion_kernel} to demonstrate the structure of a \gls{cuda} kernel. Utilising the \gls{gpu} with kernels such as \autoref{lst:erosion_kernel} significantly improves the performance of the image processing system since the processing is performed concurrently across the 128 \gls{cuda} cores of the Nvidia Jetson Nano \gls{gpu}. The image processing is optimised using three \gls{cuda} kernels, one for binarisation, one for morphological erosion, and one for morphological dilation. These kernels are used 10 times per frame to perform the mosquito and laser detection. Thus, this optimisation has a significant impact on the performance of the system.
 
